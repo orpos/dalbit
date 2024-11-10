@@ -1,3 +1,4 @@
+use anyhow::Result;
 use anyhow::{anyhow, Context};
 use auth_git2::GitAuthenticator;
 use blake3;
@@ -6,35 +7,30 @@ use fs_err;
 use git2::Repository;
 use hex;
 use serde::{Deserialize, Serialize};
-use tokio::fs;
 use std::collections::HashMap;
 use std::io;
 use std::path::PathBuf;
+use tokio::fs;
 use url::Url;
-use anyhow::Result;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Config {
-	libs: PathBuf,
-	defaults: HashMap<String, bool>
+    libs: PathBuf,
+    defaults: HashMap<String, bool>,
 }
 
 impl Config {
-	pub async fn from_file(path: impl Into<PathBuf>) -> Result<Self> {
-		let content = fs::read_to_string(path.into()).await?;
+    pub async fn from_file(path: impl Into<PathBuf>) -> Result<Self> {
+        let content = fs::read_to_string(path.into()).await?;
 
-		Ok(
-			toml::from_str(
-				content.as_str()
-			)?
-		)
-	}
+        Ok(toml::from_str(content.as_str())?)
+    }
 }
 
 pub struct Polyfill {
     path: PathBuf,
     repository: Repository,
-	config: Config
+    config: Config,
 }
 
 fn index_path(url: &Url) -> anyhow::Result<PathBuf> {
@@ -75,41 +71,44 @@ impl Polyfill {
             }
         };
 
-		let config = Config::from_file(path.join("config.toml")).await?;
+        let config = Config::from_file(path.join("config.toml")).await?;
 
         Ok(Self {
             path,
             repository,
-			config
+            config,
         })
     }
 
     pub fn fetch(&self) -> Result<()> {
-		let mut remote = self.repository.find_remote("origin")?;
-		let auth = GitAuthenticator::new();
-		auth.fetch(&self.repository, &mut remote, &["main"], None)
-			.with_context(|| format!("Could not fetch git repository"))?;
+        let mut remote = self.repository.find_remote("origin")?;
+        let auth = GitAuthenticator::new();
+        auth.fetch(&self.repository, &mut remote, &["main"], None)
+            .with_context(|| format!("Could not fetch git repository"))?;
 
-		let mut options = git2::build::CheckoutBuilder::new();
-		options.force();
+        let mut options = git2::build::CheckoutBuilder::new();
+        options.force();
 
-		let commit = self.repository.find_reference("FETCH_HEAD")?.peel_to_commit()?;
-		self.repository
-			.reset(
-				&commit.into_object(),
-				git2::ResetType::Hard,
-				Some(&mut options),
-			)
-			.with_context(|| format!("Could not reset git repo to fetch_head"))?;
+        let commit = self
+            .repository
+            .find_reference("FETCH_HEAD")?
+            .peel_to_commit()?;
+        self.repository
+            .reset(
+                &commit.into_object(),
+                git2::ResetType::Hard,
+                Some(&mut options),
+            )
+            .with_context(|| format!("Could not reset git repo to fetch_head"))?;
 
-		Ok(())
-	}
+        Ok(())
+    }
 
-	pub fn path(&self) -> &PathBuf {
-		&self.path
-	}
+    pub fn path(&self) -> &PathBuf {
+        &self.path
+    }
 
-	pub fn config(&self) -> &Config {
-		&self.config
-	}
+    pub fn config(&self) -> &Config {
+        &self.config
+    }
 }

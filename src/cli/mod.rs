@@ -3,8 +3,8 @@ use std::process::ExitCode;
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 
-mod transpile;
 mod init;
+mod transpile;
 
 use init::InitCommand;
 use transpile::TranspileCommand;
@@ -12,7 +12,7 @@ use transpile::TranspileCommand;
 #[derive(Debug, Clone, Subcommand)]
 pub enum CliSubcommand {
     Transpile(TranspileCommand),
-	Init(InitCommand)
+    Init(InitCommand),
 }
 
 /// Transpile Luau scripts
@@ -31,7 +31,7 @@ impl Dal {
     pub async fn run(self) -> Result<ExitCode> {
         match self.subcommand {
             CliSubcommand::Transpile(cmd) => cmd.run().await,
-			CliSubcommand::Init(cmd) => cmd.run().await,
+            CliSubcommand::Init(cmd) => cmd.run().await,
         }
     }
 }
