@@ -22,24 +22,20 @@ pub enum Modifier {
 }
 
 impl FromStr for Modifier {
-	type Err = anyhow::Error;
+    type Err = anyhow::Error;
 
-	fn from_str(s: &str) -> Result<Self> {
-		let modifier = match s {
-			modifiers::REMOVE_GENERALIZED_ITERATION_MODIFIER_NAME => {
-				Modifier::DarkluaRule(Box::<modifiers::RemoveGeneralizedIteration>::default())
-			}
-			modifiers::BIT32_CONVERTER_MODIFIER_NAME => Modifier::FullMoonVisitor(Box::new(
-				modifiers::Bit32Converter::default(),
-			)
-				as Box<dyn VisitorMutWrapper>),
-			_ => Modifier::DarkluaRule(
-				s
-					.parse::<Box<dyn Rule>>()
-					.map_err(|err| anyhow!(err))?,
-			),
-		};
+    fn from_str(s: &str) -> Result<Self> {
+        let modifier = match s {
+            modifiers::REMOVE_GENERALIZED_ITERATION_MODIFIER_NAME => {
+                Modifier::DarkluaRule(Box::<modifiers::RemoveGeneralizedIteration>::default())
+            }
+            modifiers::BIT32_CONVERTER_MODIFIER_NAME => Modifier::FullMoonVisitor(Box::new(
+                modifiers::Bit32Converter::default(),
+            )
+                as Box<dyn VisitorMutWrapper>),
+            _ => Modifier::DarkluaRule(s.parse::<Box<dyn Rule>>().map_err(|err| anyhow!(err))?),
+        };
 
-		Ok(modifier)
-	}
+        Ok(modifier)
+    }
 }
