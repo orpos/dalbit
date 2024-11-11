@@ -1,5 +1,4 @@
 use anyhow::{anyhow, Result};
-use full_moon::LuaVersion;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use tokio::fs;
