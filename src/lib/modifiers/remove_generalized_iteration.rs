@@ -1,4 +1,4 @@
-use crate::rules::{Context, RuleConfiguration, RuleConfigurationError, RuleProperties};
+use darklua_core::rules::{Context, RuleConfiguration, RuleConfigurationError, RuleProperties};
 use darklua_core::nodes::{
     AssignStatement, BinaryExpression, BinaryOperator, Block, DoStatement, Expression,
     FieldExpression, FunctionCall, Identifier, IfBranch, IfStatement, LocalAssignStatement, Prefix,

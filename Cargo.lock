@@ -365,6 +365,7 @@ dependencies = [
  "full_moon 1.1.0 (git+https://github.com/jiwonz/full-moon.git?branch=fix-feature-attribute)",
  "git2",
  "hex",
+ "indexmap 2.6.0",
  "log",
  "serde",
  "strfmt",
@@ -377,9 +378,9 @@ dependencies = [
 
 [[package]]
 name = "darklua-demo"
-version = "3.1.0"
+version = "3.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bc666a65db416e07f1c7b267b07be46f863cd6e24a59f5289c0286b5281e127f"
+checksum = "234ebf661df76561ddf4d6d308e584c02e9698cd13a678be73e6f8c03183d6ca"
 dependencies = [
  "anstyle",
  "blake3",
@@ -711,6 +712,7 @@ checksum = "707907fe3c25f5424cce2cb7e1cbcafee6bdbe735ca90ef77c29e84591e5b9da"
 dependencies = [
  "equivalent",
  "hashbrown 0.15.1",
+ "serde",
 ]
 
 [[package]]

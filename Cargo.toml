@@ -16,7 +16,7 @@ anyhow = "1.0.89"
 auth-git2 = "0.5.5"
 blake3 = "1.5.4"
 clap = { version = "4.5.20", features = ["derive"] }
-darklua-demo = "3.1.0"
+darklua-demo = "3.2.1"
 dirs = "5.0.1"
 fs-err = "2.11.0"
 full_moon = { git = "https://github.com/jiwonz/full-moon.git", branch = "fix-feature-attribute", features = ["luau", "lua53"] }
@@ -30,3 +30,4 @@ tokio = { version = "1.40.0", features = ["full"] }
 toml = "0.8.19"
 url = "2.5.2"
 log = "0.4.21"
+indexmap = { version = "2.6.0", features = ["serde"] }

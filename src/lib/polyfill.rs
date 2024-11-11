@@ -20,6 +20,16 @@ pub struct Config {
 }
 
 impl Config {
+	pub fn libs(&self) -> &PathBuf {
+		&self.libs
+	}
+
+	pub fn defaults(&self) -> &HashMap<String, bool> {
+		&self.defaults
+	}
+}
+
+impl Config {
     pub async fn from_file(path: impl Into<PathBuf>) -> Result<Self> {
         let content = fs::read_to_string(path.into()).await?;
 

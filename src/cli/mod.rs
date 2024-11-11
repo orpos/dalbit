@@ -5,14 +5,20 @@ use clap::{Parser, Subcommand};
 
 mod init;
 mod transpile;
+mod fetch;
 
 use init::InitCommand;
 use transpile::TranspileCommand;
+use fetch::FetchCommand;
+
+pub const DEFAULT_POLYFILL_URL: &str = "https://github.com/CavefulGames/dal-polyfill";
+pub const DEFAULT_MANIFEST_PATH: &str = "dal.toml";
 
 #[derive(Debug, Clone, Subcommand)]
 pub enum CliSubcommand {
     Transpile(TranspileCommand),
     Init(InitCommand),
+    Fetch(FetchCommand),
 }
 
 /// Transpile Luau scripts
@@ -32,6 +38,7 @@ impl Dal {
         match self.subcommand {
             CliSubcommand::Transpile(cmd) => cmd.run().await,
             CliSubcommand::Init(cmd) => cmd.run().await,
+            CliSubcommand::Fetch(cmd) => cmd.run().await,
         }
     }
 }

@@ -2,7 +2,9 @@ use std::process::ExitCode;
 
 use anyhow::Result;
 use clap::Parser;
-use dal_core::manifest::{Manifest, DEFAULT_MANIFEST_PATH};
+use dal_core::manifest::Manifest;
+
+use crate::cli::DEFAULT_MANIFEST_PATH;
 
 /// Initialize dal manifest file
 #[derive(Debug, Clone, Parser)]
