@@ -130,6 +130,7 @@ impl Default for Bit32Converter {
 }
 
 impl VisitorMut for Bit32Converter {
+	/// To detect `local x = bit32` or `local y = bit32.band`
     fn visit_local_assignment(&mut self, local_assign: LocalAssignment) -> LocalAssignment {
         let mut variables: Punctuated<Var> = Punctuated::new();
         for token in local_assign.names() {
@@ -141,6 +142,7 @@ impl VisitorMut for Bit32Converter {
         local_assign
     }
 
+	/// To detect `x = bit32` or `y = bit32.band`
     fn visit_assignment(&mut self, assign: Assignment) -> Assignment {
         if self.check_replaced(assign.variables(), assign.expressions()) {
             return Assignment::new(Punctuated::new(), Punctuated::new());
@@ -148,6 +150,9 @@ impl VisitorMut for Bit32Converter {
         assign
     }
 
+	/// To remove unused return value of bit32
+	///
+	/// Conversion Example: `bit32.band(1, 2)` -> `do then`
     fn visit_stmt(&mut self, stmt: Stmt) -> Stmt {
         if let Stmt::FunctionCall(func_call) = &stmt {
             if let Some(_) = self.convert(func_call) {
@@ -157,6 +162,9 @@ impl VisitorMut for Bit32Converter {
         stmt
     }
 
+	/// To convert bit32 methods/calls and linked identifiers into bitwise operators
+	///
+	/// Conversion Example: `local x = bit32.band; local y = x(1, 2)` -> `do then; local y = ((1&2)&0xFFFFFFFF)`
     fn visit_expression(&mut self, exp: Expression) -> Expression {
         if let Expression::FunctionCall(func_call) = &exp {
             if let Some(exp) = self.convert(func_call) {
