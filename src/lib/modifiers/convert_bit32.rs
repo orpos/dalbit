@@ -2,7 +2,7 @@ use std::string::ToString;
 use std::{collections::HashMap, str::FromStr};
 
 use full_moon::ast::punctuated::Pair;
-use full_moon::ast::{Ast, Do};
+use full_moon::ast::Do;
 use full_moon::node::Node;
 use full_moon::tokenizer::{Symbol, Token, TokenType};
 use full_moon::ShortString;
@@ -16,7 +16,7 @@ use full_moon::{
 };
 use strum_macros::{Display, EnumString};
 
-use super::{ast_util, RemoveEmptyDo};
+use super::ast_util;
 
 pub const CONVERT_BIT32_MODIFIER_NAME: &str = "convert_bit32";
 const DEFAULT_BIT32_IDENTIFIER: &str = "bit32";
@@ -119,7 +119,7 @@ impl Bit32Method {
 }
 
 #[derive(Debug)]
-struct ConvertBit32 {
+pub struct ConvertBit32 {
     bit32_identifier: String,
     bit32_methods: HashMap<String, Bit32Method>,
 }
@@ -134,51 +134,27 @@ impl Default for ConvertBit32 {
 }
 
 impl VisitorMut for ConvertBit32 {
-    /// To detect `local x = bit32` or `local y = bit32.band`
-    // fn visit_local_assignment(&mut self, local_assign: LocalAssignment) -> LocalAssignment {
-    //     let mut variables: Punctuated<Var> = Punctuated::new();
-    //     for token in local_assign.names() {
-    //         variables.push(Pair::new(Var::Name(token.clone()), None));
-    //     }
-    //     if self.check_replaced(&variables, local_assign.expressions()) {
-    //         let mut vars = Punctuated::new();
-    //         vars.push(
-    //             Pair::new(
-    //                 Var::Name(
-    //                     TokenReference::new(
-    //                         assign.surrounding_trivia().0.into_iter().cloned().collect(),
-    //                         Token::new(TokenType::Identifier { identifier: ShortString::new("_") }),
-    //                         Vec::new()
-    //                     )
-    //                 ),
-    //                 None
-    //             )
-    //         );
-    //         //return LocalAssignment::new(Punctuated::new());
-    //     }
-    //     local_assign
-    // }
-
-    /// To detect `x = bit32` or `y = bit32.band`
-    // fn visit_assignment(&mut self, assign: Assignment) -> Assignment {
-    //     if self.check_replaced(assign.variables(), assign.expressions()) {
-
-    //         return Assignment::new(
-    //             vars,
-    //             Punctuated::new()
-    //         );
-    //     }
-    //     assign
-    // }
-
-    /// To remove unused return value of bit32
-    ///
-    /// Conversion Example: `bit32.band(1, 2)` -> `do then`
     fn visit_stmt(&mut self, stmt: Stmt) -> Stmt {
         match &stmt {
             Stmt::FunctionCall(func_call) => {
                 if let Some(_) = self.convert(func_call) {
-                    return ast_util::create_empty_do_from_node(Box::new(func_call.clone()));
+                    return Stmt::Do(
+                        Do::new()
+                            .with_do_token(TokenReference::new(
+                                func_call.surrounding_trivia().0.into_iter().cloned().collect(),
+                                Token::new(TokenType::Symbol { symbol: Symbol::Do }),
+                                vec![Token::new(TokenType::Whitespace {
+                                    characters: ShortString::new(" "),
+                                })],
+                            ))
+                            .with_end_token(TokenReference::new(
+                                Vec::new(),
+                                Token::new(TokenType::Symbol {
+                                    symbol: Symbol::End,
+                                }),
+                                func_call.surrounding_trivia().1.into_iter().cloned().collect(),
+                            )),
+                    );
                 }
             }
             Stmt::Assignment(assign) => {
@@ -226,7 +202,6 @@ impl VisitorMut for ConvertBit32 {
                             do_trailing_trivia.push(t.to_owned());
                         }
                     }
-                    println!("I MADE A FUCKING do end");
                     return Stmt::Do(
                         Do::new()
                             .with_do_token(TokenReference::new(
@@ -354,20 +329,5 @@ impl ConvertBit32 {
             }
             _ => None,
         }
-    }
-}
-
-#[derive(Debug)]
-pub struct ConvertBit32AndRemoveEmptyDo {}
-
-impl VisitorMut for ConvertBit32AndRemoveEmptyDo {
-    fn visit_ast(&mut self, mut ast: Ast) -> Ast
-    where
-        Self: Sized,
-    {
-        let mut convert_bit32 = ConvertBit32::default();
-        ast = convert_bit32.visit_ast(ast);
-        let mut remove_empty_do = RemoveEmptyDo {};
-        remove_empty_do.visit_ast(ast)
     }
 }

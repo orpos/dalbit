@@ -7,13 +7,11 @@ use full_moon::{ast::Ast, visitors::VisitorMut};
 pub(crate) mod ast_util;
 mod convert_bit32;
 mod optimize_table_initializers;
-mod remove_empty_do;
 mod remove_generalized_iteration;
 mod remove_number_literals;
 
 pub use convert_bit32::*;
 pub use optimize_table_initializers::*;
-pub use remove_empty_do::*;
 pub use remove_generalized_iteration::*;
 pub use remove_number_literals::*;
 
@@ -47,7 +45,7 @@ impl FromStr for Modifier {
 				Modifier::DarkluaRule(Box::<OptimizeTableInitializers>::default())
 			}
             CONVERT_BIT32_MODIFIER_NAME => Modifier::FullMoonVisitor(Box::new(
-                ConvertBit32AndRemoveEmptyDo {},
+                ConvertBit32::default(),
             )
                 as Box<dyn VisitorMutWrapper>),
             _ => Modifier::DarkluaRule(s.parse::<Box<dyn Rule>>().map_err(|err| anyhow!(err))?),
