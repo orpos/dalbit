@@ -16,16 +16,17 @@ impl VisitorMut for RemoveEmptyDo {
             if let Stmt::Do(do_stmt) = stmt {
                 let block = do_stmt.block();
 
-                for token_ref in do_stmt.tokens() {
-                    for t in token_ref.leading_trivia() {
-                        trivia_backup.push(t);
-                    }
-                    for t in token_ref.trailing_trivia() {
-                        trivia_backup.push(t);
-                    }
-                }
-
                 if block.stmts().count() < 1 && block.last_stmt().is_none() {
+                    println!("DELETE END DO");
+                    for token_ref in do_stmt.tokens() {
+                        for t in token_ref.leading_trivia() {
+                            trivia_backup.push(t);
+                        }
+                        for t in token_ref.trailing_trivia() {
+                            trivia_backup.push(t);
+                        }
+                    }
+
                     continue;
                 }
             }
@@ -36,6 +37,8 @@ impl VisitorMut for RemoveEmptyDo {
                 for t in trivia_backup.clone() {
                     leading.push(t);
                 }
+                println!("trivia: {:?}\n\ninserted: {:?}", trivia_backup, new_stmt.surrounding_trivia());
+                trivia_backup.clear();
             }
 
             stmts.push((new_stmt, semicolon.clone()));
