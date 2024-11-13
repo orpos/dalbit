@@ -11,8 +11,7 @@ use darklua_core::{
     BundleConfiguration, Configuration, GeneratorParameters, Options, Resources,
 };
 use full_moon::{
-    ast::{Ast, Expression, Var},
-    visitors::Visitor,
+    ast::Ast, tokenizer::{Token, TokenType}, visitors::Visitor
 };
 use indexmap::IndexMap;
 use path_slash::PathBufExt;
@@ -105,17 +104,9 @@ impl CollectUsedLibraries {
 }
 
 impl Visitor for CollectUsedLibraries {
-    fn visit_expression(&mut self, exp: &Expression) {
-        if let Expression::Var(var) = exp {
-            match var {
-                Var::Expression(var_exp) => {
-                    self.think(var_exp.prefix().to_string());
-                }
-                Var::Name(_) => {
-                    self.think(var.to_string());
-                }
-                _ => {}
-            }
+    fn visit_identifier(&mut self, identifier: &Token) {
+        if let TokenType::Identifier { identifier } = identifier.token_type() {
+            self.think(identifier.to_string());
         }
     }
 }
@@ -188,7 +179,7 @@ impl Transpiler {
             (&self.target_version).to_lua_version().clone(),
         )
         .into_result()
-        .map_err(|errors| anyhow!("full-moon parsing error: {:?}", errors))?;
+        .map_err(|errors| anyhow!("full_moon parsing error: {:?}", errors))?;
 
         Ok(ast)
     }

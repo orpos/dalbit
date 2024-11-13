@@ -67,24 +67,16 @@ impl NodeProcessor for Processor {
         if let Expression::Call(func_call) = exp {
             let lib_and_call: Option<(&str, &str)> = match func_call.get_prefix() {
                 Prefix::Field(field) => {
-                    if let Prefix::Call(call) = field.get_prefix() {
-                        if let Prefix::Identifier(identifier) = call.get_prefix() {
-                            Some((field.get_field().get_name(), identifier.get_name()))
-                        } else {
-                            None
-                        }
+                    if let Prefix::Identifier(identifier) = field.get_prefix() {
+                        Some((identifier.get_name(), field.get_field().get_name()))
                     } else {
                         None
                     }
                 }
                 Prefix::Index(index) => {
                     if let Expression::String(string) = index.get_index() {
-                        if let Prefix::Call(call) = index.get_prefix() {
-                            if let Prefix::Identifier(identifier) = call.get_prefix() {
-                                Some((string.get_value(), identifier.get_name()))
-                            } else {
-                                None
-                            }
+                        if let Prefix::Identifier(identifier) = index.get_prefix() {
+                            Some((identifier.get_name(), string.get_value()))
                         } else {
                             None
                         }
