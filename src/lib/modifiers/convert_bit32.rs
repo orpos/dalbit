@@ -2,19 +2,23 @@ use std::string::ToString;
 use std::{collections::HashMap, str::FromStr};
 
 use full_moon::ast::punctuated::Pair;
+use full_moon::ast::{Ast, Do};
+use full_moon::node::Node;
+use full_moon::tokenizer::{Symbol, Token, TokenType};
+use full_moon::ShortString;
 use full_moon::{
     ast::{
-        punctuated::Punctuated, Assignment, BinOp, Call, Do, Expression, FunctionArgs,
-        FunctionCall, Index, LocalAssignment, Stmt, Suffix, UnOp, Var,
+        punctuated::Punctuated, BinOp, Call, Expression, FunctionArgs, FunctionCall, Index, Stmt,
+        Suffix, UnOp, Var,
     },
     tokenizer::TokenReference,
     visitors::VisitorMut,
 };
 use strum_macros::{Display, EnumString};
 
-use super::ast_util;
+use super::{ast_util, RemoveEmptyDo};
 
-pub const BIT32_CONVERTER_MODIFIER_NAME: &str = "convert_bit32";
+pub const CONVERT_BIT32_MODIFIER_NAME: &str = "convert_bit32";
 const DEFAULT_BIT32_IDENTIFIER: &str = "bit32";
 const MASKING_NUMBER_TOKEN_SYMBOL: &str = "0xFFFFFFFF";
 
@@ -115,12 +119,12 @@ impl Bit32Method {
 }
 
 #[derive(Debug)]
-pub struct Bit32Converter {
+struct ConvertBit32 {
     bit32_identifier: String,
     bit32_methods: HashMap<String, Bit32Method>,
 }
 
-impl Default for Bit32Converter {
+impl Default for ConvertBit32 {
     fn default() -> Self {
         Self {
             bit32_identifier: DEFAULT_BIT32_IDENTIFIER.to_owned(),
@@ -129,42 +133,127 @@ impl Default for Bit32Converter {
     }
 }
 
-impl VisitorMut for Bit32Converter {
-	/// To detect `local x = bit32` or `local y = bit32.band`
-    fn visit_local_assignment(&mut self, local_assign: LocalAssignment) -> LocalAssignment {
-        let mut variables: Punctuated<Var> = Punctuated::new();
-        for token in local_assign.names() {
-            variables.push(Pair::new(Var::Name(token.clone()), None));
-        }
-        if self.check_replaced(&variables, local_assign.expressions()) {
-            return LocalAssignment::new(Punctuated::new());
-        }
-        local_assign
-    }
+impl VisitorMut for ConvertBit32 {
+    /// To detect `local x = bit32` or `local y = bit32.band`
+    // fn visit_local_assignment(&mut self, local_assign: LocalAssignment) -> LocalAssignment {
+    //     let mut variables: Punctuated<Var> = Punctuated::new();
+    //     for token in local_assign.names() {
+    //         variables.push(Pair::new(Var::Name(token.clone()), None));
+    //     }
+    //     if self.check_replaced(&variables, local_assign.expressions()) {
+    //         let mut vars = Punctuated::new();
+    //         vars.push(
+    //             Pair::new(
+    //                 Var::Name(
+    //                     TokenReference::new(
+    //                         assign.surrounding_trivia().0.into_iter().cloned().collect(),
+    //                         Token::new(TokenType::Identifier { identifier: ShortString::new("_") }),
+    //                         Vec::new()
+    //                     )
+    //                 ),
+    //                 None
+    //             )
+    //         );
+    //         //return LocalAssignment::new(Punctuated::new());
+    //     }
+    //     local_assign
+    // }
 
-	/// To detect `x = bit32` or `y = bit32.band`
-    fn visit_assignment(&mut self, assign: Assignment) -> Assignment {
-        if self.check_replaced(assign.variables(), assign.expressions()) {
-            return Assignment::new(Punctuated::new(), Punctuated::new());
-        }
-        assign
-    }
+    /// To detect `x = bit32` or `y = bit32.band`
+    // fn visit_assignment(&mut self, assign: Assignment) -> Assignment {
+    //     if self.check_replaced(assign.variables(), assign.expressions()) {
 
-	/// To remove unused return value of bit32
-	///
-	/// Conversion Example: `bit32.band(1, 2)` -> `do then`
+    //         return Assignment::new(
+    //             vars,
+    //             Punctuated::new()
+    //         );
+    //     }
+    //     assign
+    // }
+
+    /// To remove unused return value of bit32
+    ///
+    /// Conversion Example: `bit32.band(1, 2)` -> `do then`
     fn visit_stmt(&mut self, stmt: Stmt) -> Stmt {
-        if let Stmt::FunctionCall(func_call) = &stmt {
-            if let Some(_) = self.convert(func_call) {
-                return Stmt::Do(Do::new());
+        match &stmt {
+            Stmt::FunctionCall(func_call) => {
+                if let Some(_) = self.convert(func_call) {
+                    return ast_util::create_empty_do_from_node(Box::new(func_call.clone()));
+                }
             }
+            Stmt::Assignment(assign) => {
+                if self.check_replaced(assign.variables(), assign.expressions()) {
+                    let mut do_trailing_trivia: Vec<Token> = Vec::new();
+                    for token_ref in assign.tokens() {
+                        for t in token_ref.leading_trivia() {
+                            do_trailing_trivia.push(t.to_owned());
+                        }
+                        for t in token_ref.trailing_trivia() {
+                            do_trailing_trivia.push(t.to_owned());
+                        }
+                    }
+                    return Stmt::Do(
+                        Do::new()
+                            .with_do_token(TokenReference::new(
+                                Vec::new(),
+                                Token::new(TokenType::Symbol { symbol: Symbol::Do }),
+                                do_trailing_trivia,
+                            ))
+                            .with_end_token(TokenReference::new(
+                                vec![Token::new(TokenType::Whitespace {
+                                    characters: ShortString::new(" "),
+                                })],
+                                Token::new(TokenType::Symbol {
+                                    symbol: Symbol::End,
+                                }),
+                                Vec::new(),
+                            )),
+                    );
+                }
+            }
+            Stmt::LocalAssignment(local_assign) => {
+                let mut variables: Punctuated<Var> = Punctuated::new();
+                for token in local_assign.names() {
+                    variables.push(Pair::new(Var::Name(token.clone()), None));
+                }
+                if self.check_replaced(&variables, local_assign.expressions()) {
+                    let mut do_trailing_trivia: Vec<Token> = Vec::new();
+                    for token_ref in local_assign.tokens() {
+                        for t in token_ref.leading_trivia() {
+                            do_trailing_trivia.push(t.to_owned());
+                        }
+                        for t in token_ref.trailing_trivia() {
+                            do_trailing_trivia.push(t.to_owned());
+                        }
+                    }
+                    println!("I MADE A FUCKING do end");
+                    return Stmt::Do(
+                        Do::new()
+                            .with_do_token(TokenReference::new(
+                                Vec::new(),
+                                Token::new(TokenType::Symbol { symbol: Symbol::Do }),
+                                do_trailing_trivia,
+                            ))
+                            .with_end_token(TokenReference::new(
+                                Vec::new(),
+                                Token::new(TokenType::Symbol {
+                                    symbol: Symbol::End,
+                                }),
+                                vec![Token::new(TokenType::Whitespace {
+                                    characters: ShortString::new(" "),
+                                })],
+                            )),
+                    );
+                }
+            }
+            _ => {}
         }
         stmt
     }
 
-	/// To convert bit32 methods/calls and linked identifiers into bitwise operators
-	///
-	/// Conversion Example: `local x = bit32.band; local y = x(1, 2)` -> `do then; local y = ((1&2)&0xFFFFFFFF)`
+    /// To convert bit32 methods/calls and linked identifiers into bitwise operators
+    ///
+    /// Conversion Example: `local x = bit32.band; local y = x(1, 2)` -> `do then; local y = ((1&2)&0xFFFFFFFF)`
     fn visit_expression(&mut self, exp: Expression) -> Expression {
         if let Expression::FunctionCall(func_call) = &exp {
             if let Some(exp) = self.convert(func_call) {
@@ -175,7 +264,7 @@ impl VisitorMut for Bit32Converter {
     }
 }
 
-impl Bit32Converter {
+impl ConvertBit32 {
     #[inline]
     fn is_bit32_identifier(&self, string: impl Into<String>) -> bool {
         string.into() == self.bit32_identifier
@@ -191,7 +280,7 @@ impl Bit32Converter {
             if let Expression::Var(exp) = exp {
                 match exp {
                     Var::Expression(var_exp) => {
-                        println!("{}", var_exp.prefix().to_string());
+                        // println!("{}", var_exp.prefix().to_string());
                         if !self.is_bit32_identifier(var_exp.prefix().to_string()) {
                             return false;
                         }
@@ -202,15 +291,15 @@ impl Bit32Converter {
                             if let Suffix::Index(index) = first {
                                 let index = index_to_string(index);
                                 if let Some(index) = index {
-                                    println!(
-                                        "debug index: {}, var: {}",
-                                        index.trim(),
-                                        var.to_string().trim()
-                                    );
+                                    // println!(
+                                    //     "debug index: {}, var: {}",
+                                    //     index.trim(),
+                                    //     var.to_string().trim()
+                                    // );
                                     if let Ok(method) = Bit32Method::from_str(index.trim()) {
                                         self.bit32_methods
                                             .insert(var.to_string().trim().to_owned(), method);
-                                        println!("bit32 methods: {:?}", self.bit32_methods);
+                                        // println!("bit32 methods: {:?}", self.bit32_methods);
                                         return true;
                                     }
                                 }
@@ -255,8 +344,8 @@ impl Bit32Converter {
             (Some(first), None) => {
                 // there's only a call(ex. `(1, 2)`)
                 if let Suffix::Call(call) = first {
-                    println!("bit32 methods: {:?}", self.bit32_methods);
-                    println!("bit32 method: {:?}", self.bit32_methods.get(&prefix));
+                    // println!("bit32 methods: {:?}", self.bit32_methods);
+                    // println!("bit32 method: {:?}", self.bit32_methods.get(&prefix));
                     if let Some(method) = self.bit32_methods.get(&prefix) {
                         return method.convert(call);
                     }
@@ -265,5 +354,20 @@ impl Bit32Converter {
             }
             _ => None,
         }
+    }
+}
+
+#[derive(Debug)]
+pub struct ConvertBit32AndRemoveEmptyDo {}
+
+impl VisitorMut for ConvertBit32AndRemoveEmptyDo {
+    fn visit_ast(&mut self, mut ast: Ast) -> Ast
+    where
+        Self: Sized,
+    {
+        let mut convert_bit32 = ConvertBit32::default();
+        ast = convert_bit32.visit_ast(ast);
+        let mut remove_empty_do = RemoveEmptyDo {};
+        remove_empty_do.visit_ast(ast)
     }
 }

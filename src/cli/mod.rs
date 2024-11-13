@@ -3,13 +3,13 @@ use std::process::ExitCode;
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 
+mod fetch;
 mod init;
 mod transpile;
-mod fetch;
 
+use fetch::FetchCommand;
 use init::InitCommand;
 use transpile::TranspileCommand;
-use fetch::FetchCommand;
 
 pub const DEFAULT_POLYFILL_URL: &str = "https://github.com/CavefulGames/dal-polyfill";
 pub const DEFAULT_MANIFEST_PATH: &str = "dal.toml";

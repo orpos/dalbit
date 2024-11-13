@@ -1,6 +1,7 @@
 use full_moon::{
-    ast::{span::ContainedSpan, BinOp, Expression, UnOp},
-    tokenizer::{Token, TokenReference, TokenType},
+    ast::{span::ContainedSpan, BinOp, Do, Expression, Stmt, UnOp},
+    node::Node,
+    tokenizer::{Symbol, Token, TokenReference, TokenType},
     ShortString,
 };
 
@@ -46,4 +47,25 @@ pub fn create_number<T: Into<String> + AsRef<str>>(number_text: T) -> Expression
         }),
         Vec::new(),
     ))
+}
+
+#[inline]
+pub fn create_empty_do_from_node(node: Box<dyn Node>) -> Stmt {
+    Stmt::Do(
+        Do::new()
+            .with_do_token(TokenReference::new(
+                node.surrounding_trivia().0.into_iter().cloned().collect(),
+                Token::new(TokenType::Symbol { symbol: Symbol::Do }),
+                vec![Token::new(TokenType::Whitespace {
+                    characters: ShortString::new(" "),
+                })],
+            ))
+            .with_end_token(TokenReference::new(
+                Vec::new(),
+                Token::new(TokenType::Symbol {
+                    symbol: Symbol::End,
+                }),
+                node.surrounding_trivia().1.into_iter().cloned().collect(),
+            )),
+    )
 }

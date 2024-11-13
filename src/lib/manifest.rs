@@ -1,8 +1,8 @@
 use anyhow::{anyhow, Result};
+use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use tokio::fs;
-use indexmap::IndexMap;
 
 use crate::TargetVersion;
 
@@ -100,16 +100,14 @@ impl Manifest {
     }
 
     pub fn require_input(&self, replacement: Option<PathBuf>) -> Result<PathBuf> {
-        replacement.or(self.input.clone())
-            .ok_or_else(|| {
-                anyhow!("Error: 'inputs' is required but not provided.")
-            })
+        replacement
+            .or(self.input.clone())
+            .ok_or_else(|| anyhow!("Error: 'inputs' is required but not provided."))
     }
 
     pub fn require_output(&self, replacement: Option<PathBuf>) -> Result<PathBuf> {
-        replacement.or(self.output.clone())
-            .ok_or_else(|| {
-                anyhow!("Error: 'output' is required but not provided.")
-            })
+        replacement
+            .or(self.output.clone())
+            .ok_or_else(|| anyhow!("Error: 'output' is required but not provided."))
     }
 }

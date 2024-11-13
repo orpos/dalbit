@@ -31,3 +31,5 @@ toml = "0.8.19"
 url = "2.5.2"
 log = "0.4.21"
 indexmap = { version = "2.6.0", features = ["serde"] }
+pathdiff = "0.2.2"
+path-slash = "0.2.1"

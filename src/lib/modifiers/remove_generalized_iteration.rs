@@ -1,15 +1,16 @@
-use darklua_core::rules::{Context, RuleConfiguration, RuleConfigurationError, RuleProperties};
 use darklua_core::nodes::{
     AssignStatement, BinaryExpression, BinaryOperator, Block, DoStatement, Expression,
     FieldExpression, FunctionCall, Identifier, IfBranch, IfStatement, LocalAssignStatement, Prefix,
     Statement, StringExpression, TupleArguments, TypedIdentifier, Variable,
 };
 use darklua_core::process::{DefaultVisitor, NodeProcessor, NodeVisitor};
+use darklua_core::rules::{Context, RuleConfiguration, RuleConfigurationError, RuleProperties};
 
 use darklua_core::rules::runtime_identifier::RuntimeIdentifierBuilder;
 use darklua_core::rules::{Rule, RuleProcessResult};
 
 const METATABLE_VARIABLE_NAME: &str = "m";
+const SETMETATABLE_IDENTIFIER: &str = "__DAL_setmetatable_iter";
 
 struct Processor {
     iterator_identifier: String,
@@ -73,7 +74,7 @@ impl Processor {
                     let mt_identifier = mt_typed_identifier.get_identifier().clone();
 
                     let get_mt_call = FunctionCall::new(
-                        Prefix::from_name("__DAL_getmetatable"),
+                        Prefix::from_name(SETMETATABLE_IDENTIFIER),
                         TupleArguments::new(vec![iterator_exp.clone()]).into(),
                         None,
                     );

@@ -6,8 +6,8 @@ use dirs;
 use fs_err;
 use git2::Repository;
 use hex;
+use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 use std::io;
 use std::path::PathBuf;
 use tokio::fs;
@@ -15,18 +15,28 @@ use url::Url;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Config {
-    libs: PathBuf,
-    defaults: HashMap<String, bool>,
+    input: PathBuf,
+    removes: Option<Vec<String>>,
+    settings: IndexMap<String, bool>,
+    libraries: IndexMap<String, bool>,
 }
 
 impl Config {
-	pub fn libs(&self) -> &PathBuf {
-		&self.libs
-	}
+    pub fn input(&self) -> &PathBuf {
+        &self.input
+    }
 
-	pub fn defaults(&self) -> &HashMap<String, bool> {
-		&self.defaults
-	}
+    pub fn settings(&self) -> &IndexMap<String, bool> {
+        &self.settings
+    }
+
+    pub fn libraries(&self) -> &IndexMap<String, bool> {
+        &self.libraries
+    }
+
+    pub fn removes(&self) -> &Option<Vec<String>> {
+        &self.removes
+    }
 }
 
 impl Config {
