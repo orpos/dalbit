@@ -45,7 +45,7 @@ input = "inputs"
 output = "outputs"
 file_extension = "lua"
 target_version = "lua53"
-auto_optimize = true
+minify = true
 
 [modifiers]
 convert_bit32 = true
