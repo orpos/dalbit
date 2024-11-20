@@ -1,9 +1,42 @@
 # Dal
-Dal(달)은 `darklua`를 사용하여 `luau`를 `lua`(PUC)로 트랜스파일하기 위한 `lune` 스크립트입니다.
+Dal(달) is a Luau-to-Lua transpiler based on `darklua`, designed specifically for `Lua 5.3`.
 
-## 요구사항
-- [jiwonz/darklua](https://github.com/jiwonz/darklua) - 아직 `darklua`로 PR이 받아지지않은 상황이기에 해당 `darklua`를 사용합니다.
-- [lune](https://github.com/lune-org/lune) - 이 Lune 스크립트를 실행하기 위한 런타임
+## Note
+This project is still in W.I.P
 
-## 크레딧
-- bitbuf
+## TO-DOs
+- [x] Implement CLI.
+- [x] Implement basic transpilation process using `darklua` and `full-moon`.
+- [ ] Implement modifiers (such as converting number literals and generalized iterations)
+- [ ] Implement basic lua polyfills.
+
+## Installation
+Coming soon (will be available at `rokit` and `crates.io`(for `cargo install`))
+
+## Usage
+
+### `init`
+Initializes dal manifest file in the current path.
+```sh
+dal init
+```
+
+### `fetch`
+Fetches and updates lua polyfills.
+* This polyfill can be found [here](https://github.com/CavefulGames/dal-polyfill).
+```sh
+dal fetch
+```
+
+### `transpile`
+Transpiles luau code to lua code.
+```sh
+dal transpile [input] [output]
+```
+
+## Special Thanks
+- [seaofvoices/darklua](https://github.com/seaofvoices/darklua) - Providing important and cool lua mutating rules.
+- [Kampfkarren/full-moon](https://github.com/Kampfkarren/full-moon) - A lossless Lua parser.
+
+## Trivia
+The name of this project, Dal, translates to "moon" in Korean.
