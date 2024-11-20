@@ -7,11 +7,11 @@ This project is still in W.I.P
 ## TO-DOs
 - [x] Implement CLI.
 - [x] Implement basic transpilation process using `darklua` and `full-moon`.
-- [ ] Implement modifiers (such as converting number literals and generalized iterations)
+- [x] Implement modifiers (such as converting number literals and generalized iterations)
 - [ ] Implement basic lua polyfills.
 
 ## Installation
-Coming soon (will be available at `rokit` and `crates.io`(for `cargo install`))
+Coming soon! (will be available at `rokit` and `crates.io`(for `cargo install`))
 
 ## Usage
 
@@ -32,6 +32,68 @@ dal fetch
 Transpiles luau code to lua code.
 ```sh
 dal transpile [input] [output]
+```
+
+## Example
+### `dal.toml`
+```toml
+input = "inputs"
+output = "outputs"
+file_extension = "lua"
+target_version = "lua53"
+auto_optimize = true
+
+[modifiers]
+convert_bit32 = true
+optimize_table_initializers = true
+
+[libs]
+
+```
+
+### `inputs/input.luau`
+```luau
+local log = math.log
+local floor = math.floor
+local x = bit32
+local band = x.band
+local rshift = x.rshift
+local lshift = x.lshift
+local bnot = x.bnot
+local bor = x.bor
+local t = table.create(1)
+
+local function byteswap(n: number): number
+	return bor(bor(bor(lshift(n, 24), band(lshift(n, 8), 0xff0000)), band(rshift(n, 8), 0xff00)), rshift(n, 24))
+end
+
+print(byteswap(5))
+print(log(5))
+print(floor(0.5))
+print(t)
+
+```
+
+### `outputs/output.luau`
+```lua
+local math=require'./__dal_libs__'.math local io=nil local module=nil local package=nil local dofile=nil local loadfile=nil local log=math.log
+local floor=math.floor
+do
+end do
+end do
+end do  end do
+
+end do
+end local t={}
+
+local function byteswap(n)
+return ((((((((n<<24)&0xFFFFFFFF)|((((n<<8)&0xFFFFFFFF)&0xff0000)&0xFFFFFFFF))&0xFFFFFFFF)|((((n>>8)&0xFFFFFFFF)&0xff00)&0xFFFFFFFF))&0xFFFFFFFF)|((n>>24)&0xFFFFFFFF))&0xFFFFFFFF)
+end
+
+print(byteswap(5))
+print(log(5))
+print(floor(0.5))
+print(t)
 ```
 
 ## Special Thanks
