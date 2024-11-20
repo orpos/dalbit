@@ -11,7 +11,9 @@ use darklua_core::{
     BundleConfiguration, Configuration, GeneratorParameters, Options, Resources,
 };
 use full_moon::{
-    ast::Ast, tokenizer::{Token, TokenType}, visitors::Visitor
+    ast::Ast,
+    tokenizer::{Token, TokenType},
+    visitors::Visitor,
 };
 use indexmap::IndexMap;
 use path_slash::PathBufExt;

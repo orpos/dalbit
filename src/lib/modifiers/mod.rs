@@ -41,9 +41,9 @@ impl FromStr for Modifier {
             REMOVE_NUMBER_LITERALS_MODIFIER_NAME => {
                 Modifier::DarkluaRule(Box::<RemoveNumberLiterals>::default())
             }
-			OPTIMIZE_TABLE_INITIALIZERS_MODIFIER_NAME => {
-				Modifier::DarkluaRule(Box::<OptimizeTableInitializers>::default())
-			}
+            OPTIMIZE_TABLE_INITIALIZERS_MODIFIER_NAME => {
+                Modifier::DarkluaRule(Box::<OptimizeTableInitializers>::default())
+            }
             CONVERT_BIT32_MODIFIER_NAME => Modifier::FullMoonVisitor(Box::new(
                 ConvertBit32::default(),
             )

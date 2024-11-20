@@ -141,7 +141,12 @@ impl VisitorMut for ConvertBit32 {
                     return Stmt::Do(
                         Do::new()
                             .with_do_token(TokenReference::new(
-                                func_call.surrounding_trivia().0.into_iter().cloned().collect(),
+                                func_call
+                                    .surrounding_trivia()
+                                    .0
+                                    .into_iter()
+                                    .cloned()
+                                    .collect(),
                                 Token::new(TokenType::Symbol { symbol: Symbol::Do }),
                                 vec![Token::new(TokenType::Whitespace {
                                     characters: ShortString::new(" "),
@@ -152,7 +157,12 @@ impl VisitorMut for ConvertBit32 {
                                 Token::new(TokenType::Symbol {
                                     symbol: Symbol::End,
                                 }),
-                                func_call.surrounding_trivia().1.into_iter().cloned().collect(),
+                                func_call
+                                    .surrounding_trivia()
+                                    .1
+                                    .into_iter()
+                                    .cloned()
+                                    .collect(),
                             )),
                     );
                 }
