@@ -34,7 +34,7 @@ pub const DEFAULT_LUAU_TO_LUA_MODIFIERS: [&str; 8] = [
     "remove_number_literals",
 ];
 
-pub const DEFAULT_OPTIMIZING_MODIFIERS: [&str; 11] = [
+pub const DEFAULT_MINIFYING_MODIFIERS: [&str; 11] = [
     "remove_unused_variable",
     "remove_unused_while",
     "remove_unused_if_branch",
@@ -131,8 +131,8 @@ impl Default for Transpiler {
 }
 
 impl Transpiler {
-    pub fn with_optimizing_modifiers(mut self) -> Self {
-        for name in DEFAULT_OPTIMIZING_MODIFIERS {
+    pub fn with_minifying_modifiers(mut self) -> Self {
+        for name in DEFAULT_MINIFYING_MODIFIERS {
             self.modifiers.insert(name.to_owned(), true);
         }
         self
@@ -152,8 +152,8 @@ impl Transpiler {
 
     pub fn with_manifest(mut self, manifest: &Manifest) -> Self {
         self = self.with_modifiers(manifest.modifiers());
-        if manifest.auto_optimize {
-            self = self.with_optimizing_modifiers();
+        if manifest.minify {
+            self = self.with_minifying_modifiers();
         }
         if let Some(extension) = manifest.extension() {
             self = self.with_extension(extension);

@@ -12,7 +12,7 @@ pub struct Manifest {
     input: Option<PathBuf>,
     file_extension: Option<String>,
     target_version: TargetVersion,
-    pub auto_optimize: bool,
+    pub minify: bool,
     // #[serde(default, deserialize_with = "crate::serde_utils::string_or_struct")]
     // generator: GeneratorParameters,
     modifiers: IndexMap<String, bool>,
@@ -26,7 +26,7 @@ impl Default for Manifest {
             input: None,
             file_extension: Some("lua".to_owned()),
             target_version: TargetVersion::Lua53,
-            auto_optimize: true,
+            minify: true,
             // generator: GeneratorParameters::RetainLines,
             modifiers: IndexMap::new(),
             libs: IndexMap::new(),
