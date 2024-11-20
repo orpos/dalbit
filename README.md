@@ -9,6 +9,10 @@ This project is still in W.I.P
 - [x] Implement basic transpilation process using `darklua` and `full-moon`.
 - [x] Implement modifiers (such as converting number literals and generalized iterations)
 - [ ] Implement basic lua polyfills.
+- [ ] Add tests for polyfills.
+- [ ] Add tests for transpilation.
+- [ ] Add tests for dal internally.
+- [ ] Add logging for dal internally for debug.
 
 ## Installation
 Coming soon! (will be available at `rokit` and `crates.io`(for `cargo install`))
