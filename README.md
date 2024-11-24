@@ -10,9 +10,11 @@ This project is still in W.I.P
 - [x] Implement modifiers (such as converting number literals and generalized iterations)
 - [ ] Implement basic lua polyfills.
 - [ ] Add tests for polyfills.
-- [ ] Add tests for transpilation.
+- [ ] Add tests for transpilation. (to ensure the same results)
 - [ ] Add tests for dal internally.
 - [ ] Add logging for dal internally for debug.
+- [x] `convert_bit32` modifier now converts `bit32.btest`.
+- [ ] Add comments for docs and code readability.
 
 ## Installation
 Coming soon! (will be available at `rokit` and `crates.io`(for `cargo install`))
