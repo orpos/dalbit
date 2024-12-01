@@ -12,7 +12,6 @@ use log::Level;
 
 const STACK_SIZE: usize = 4 * 1024 * 1024;
 
-// #[tokio::main(flavor = "multi_thread")]
 fn run() -> ExitCode {
     let rt = runtime::Builder::new_multi_thread().build().unwrap();
 
