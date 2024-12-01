@@ -9,13 +9,13 @@ This project is still in W.I.P
 - [x] Implement basic transpilation process using `darklua` and `full-moon`.
 - [x] Implement modifiers (such as converting number literals and generalized iterations)
 - [ ] Implement basic lua polyfills.
-- [ ] Add tests for polyfills.
-- [ ] Add tests for transpilation. (to ensure the same results)
+- [x] Add tests for polyfills.
+- [ ] Add tests for transpilation. (to ensure the same results in lua and luau)
 - [ ] Add tests for dal internally.
 - [ ] Add logging for dal internally for debug.
 - [x] `convert_bit32` modifier now converts `bit32.btest`.
 - [ ] Add comments for docs and code readability.
-- [ ] Optimize polyfill.
+- [x] Optimize polyfill.
 
 ## Installation
 Coming soon! (will be available at `rokit` and `crates.io`(for `cargo install`))
