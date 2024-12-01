@@ -44,17 +44,14 @@ dal transpile [input] [output]
 ## Example
 ### `dal.toml`
 ```toml
-input = "inputs"
-output = "outputs"
 file_extension = "lua"
 target_version = "lua53"
 minify = true
 
 [modifiers]
 convert_bit32 = true
-optimize_table_initializers = true
 
-[libs]
+[globals]
 
 ```
 
@@ -83,7 +80,7 @@ print(t)
 
 ### `outputs/output.luau`
 ```lua
-local math=require'./__dal_libs__'.math local io=nil local module=nil local package=nil local dofile=nil local loadfile=nil local log=math.log
+local math=require'./__polyfill__'.math local table=require'./__polyfill__'.table local io=nil local module=nil local package=nil local dofile=nil local loadfile=nil local load=nil local log=math.log
 local floor=math.floor
 do
 end do
@@ -91,7 +88,7 @@ end do
 end do  end do
 
 end do
-end local t={}
+end local t=table.create(1)
 
 local function byteswap(n)
 return ((((((((n<<24)&0xFFFFFFFF)|((((n<<8)&0xFFFFFFFF)&0xff0000)&0xFFFFFFFF))&0xFFFFFFFF)|((((n>>8)&0xFFFFFFFF)&0xff00)&0xFFFFFFFF))&0xFFFFFFFF)|((n>>24)&0xFFFFFFFF))&0xFFFFFFFF)
