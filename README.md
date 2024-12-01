@@ -100,6 +100,10 @@ print(floor(0.5))
 print(t)
 ```
 
+## Why `darklua-demo` over `darklua`?
+- `darklua-demo` is a temporary fork to work properly with dal.
+- `darklua-demo` will be replaced by official `darklua` once darklua released with important features to work properly with dal.
+
 ## Special Thanks
 - [seaofvoices/darklua](https://github.com/seaofvoices/darklua) - Providing important and cool lua mutating rules.
 - [Kampfkarren/full-moon](https://github.com/Kampfkarren/full-moon) - A lossless Lua parser.
