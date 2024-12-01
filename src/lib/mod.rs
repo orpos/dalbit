@@ -8,6 +8,7 @@ pub mod polyfill;
 pub mod transpiler;
 pub mod utils;
 
+/// Represents lua versions that implement serde
 #[non_exhaustive]
 #[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(rename_all = "snake_case")]

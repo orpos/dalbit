@@ -20,6 +20,7 @@ pub(crate) async fn parse_file(path: &PathBuf, target_version: &TargetVersion) -
     Ok(ast)
 }
 
+/// Gets exports of lua modules by parsing last statement's table constructor.
 pub async fn get_exports_from_last_stmt(target: &ParseTarget) -> Result<Option<HashSet<String>>> {
     let ast = match target {
         ParseTarget::FullMoonAst(ast) => ast,

@@ -49,6 +49,7 @@ impl Visitor for CollectUsedLibraries {
     }
 }
 
+/// Injector that injects module's export which is a table constructor.
 pub struct Injector {
     module_path: PathBuf,
     exports: HashSet<String>,

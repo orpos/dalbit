@@ -23,6 +23,7 @@ pub trait WritableManifest: Send + Sized + Serialize + DeserializeOwned {
     }
 }
 
+/// Manifest for dal transpiler.
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Manifest {
     output: Option<PathBuf>,

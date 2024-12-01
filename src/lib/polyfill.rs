@@ -17,6 +17,7 @@ use url::Url;
 use crate::manifest::WritableManifest;
 use crate::{utils, TargetVersion};
 
+/// Polyfill's manifest (`/polyfill.toml` in a polyfill repository)
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Manifest {
     globals: PathBuf,
@@ -27,6 +28,7 @@ pub struct Manifest {
 
 impl WritableManifest for Manifest {}
 
+/// Polyfill's globals.
 #[derive(Debug)]
 pub struct Globals {
     path: PathBuf,
@@ -45,6 +47,7 @@ impl Globals {
     }
 }
 
+/// Represents a polyfill structure.
 pub struct Polyfill {
     repository: Repository,
     path: PathBuf,
@@ -74,6 +77,7 @@ fn index_path(url: &Url) -> anyhow::Result<PathBuf> {
 }
 
 impl Polyfill {
+	/// Creates a new polyfill from git repository.
     pub async fn new(url: &Url) -> Result<Self> {
         let path = index_path(url)?;
         let repository = match Repository::open(path.as_path()) {
@@ -114,6 +118,7 @@ impl Polyfill {
         })
     }
 
+	/// Fetches and updates polyfill repository using git.
     pub fn fetch(&self) -> Result<()> {
         let mut remote = self.repository.find_remote("origin")?;
         let auth = GitAuthenticator::new();
