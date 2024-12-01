@@ -31,8 +31,6 @@ pub struct Manifest {
     file_extension: Option<String>,
     target_version: TargetVersion,
     pub minify: bool,
-    // #[serde(default, deserialize_with = "crate::serde_utils::string_or_struct")]
-    // generator: GeneratorParameters,
     modifiers: IndexMap<String, bool>,
     globals: IndexMap<String, bool>,
 }
