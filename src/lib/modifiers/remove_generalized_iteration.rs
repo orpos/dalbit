@@ -6,7 +6,7 @@ use darklua_core::nodes::{
 use darklua_core::process::{DefaultVisitor, NodeProcessor, NodeVisitor};
 use darklua_core::rules::{Context, RuleConfiguration, RuleConfigurationError, RuleProperties};
 
-use darklua_core::rules::runtime_identifier::RuntimeIdentifierBuilder;
+use super::runtime_identifier::RuntimeIdentifierBuilder;
 use darklua_core::rules::{Rule, RuleProcessResult};
 
 const METATABLE_VARIABLE_NAME: &str = "m";

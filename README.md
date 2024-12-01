@@ -15,6 +15,7 @@ This project is still in W.I.P
 - [ ] Add logging for dal internally for debug.
 - [x] `convert_bit32` modifier now converts `bit32.btest`.
 - [ ] Add comments for docs and code readability.
+- [ ] Optimize polyfill.
 
 ## Installation
 Coming soon! (will be available at `rokit` and `crates.io`(for `cargo install`))
