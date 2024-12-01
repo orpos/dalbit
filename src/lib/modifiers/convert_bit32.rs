@@ -202,7 +202,9 @@ impl VisitorMut for ConvertBit32 {
                     return Stmt::Do(
                         Do::new()
                             .with_do_token(TokenReference::new(
-                                Vec::new(),
+                                vec![Token::new(TokenType::Whitespace {
+                                    characters: ShortString::new(" "),
+                                })],
                                 Token::new(TokenType::Symbol { symbol: Symbol::Do }),
                                 do_trailing_trivia,
                             ))
@@ -213,7 +215,9 @@ impl VisitorMut for ConvertBit32 {
                                 Token::new(TokenType::Symbol {
                                     symbol: Symbol::End,
                                 }),
-                                Vec::new(),
+                                vec![Token::new(TokenType::Whitespace {
+                                    characters: ShortString::new(" "),
+                                })],
                             )),
                     );
                 }
@@ -236,7 +240,9 @@ impl VisitorMut for ConvertBit32 {
                     return Stmt::Do(
                         Do::new()
                             .with_do_token(TokenReference::new(
-                                Vec::new(),
+                                vec![Token::new(TokenType::Whitespace {
+                                    characters: ShortString::new(" "),
+                                })],
                                 Token::new(TokenType::Symbol { symbol: Symbol::Do }),
                                 do_trailing_trivia,
                             ))

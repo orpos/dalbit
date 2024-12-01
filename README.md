@@ -82,12 +82,12 @@ print(t)
 ```lua
 local math=require'./__polyfill__'.math local table=require'./__polyfill__'.table local io=nil local module=nil local package=nil local dofile=nil local loadfile=nil local load=nil local log=math.log
 local floor=math.floor
-do
-end do
-end do
-end do  end do
+ do
+end  do
+end  do
+end  do  end  do
 
-end do
+end  do
 end local t=table.create(1)
 
 local function byteswap(n)
