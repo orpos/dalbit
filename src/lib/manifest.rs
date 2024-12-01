@@ -55,42 +55,6 @@ impl Default for Manifest {
 impl WritableManifest for Manifest {}
 
 impl Manifest {
-    // pub fn add_default_modifiers(&mut self) {
-    //     for modifier_name in DEFAULT_LUAU_TO_LUA_MODIFIERS {
-    //         self.insert_modifier(modifier_name.to_owned(), true);
-    //     }
-    //     if self.auto_optimize {
-    //         for modifier_name in DEFAULT_OPTIMIZING_MODIFIERS {
-    //             self.insert_modifier(modifier_name.to_owned(), true);
-    //         }
-    //     }
-    // }
-
-    // pub fn insert_modifier(&mut self, modifier_name: String, enabled: bool) {
-    //     let enabled = if let Some(&old_enabled) = self.modifiers.get(&modifier_name) {
-    //         old_enabled && enabled
-    //     } else {
-    //         enabled
-    //     };
-    //     self.modifiers.insert(modifier_name, enabled);
-    // }
-
-    // pub fn contains_rule(&self, modifier_name: String) -> bool {
-    //     self.modifiers.contains_key(&modifier_name)
-    // }
-
-    // pub fn modifiers(&self) -> Result<Vec<Modifier>> {
-    //     self.modifiers.iter()
-    //         .filter_map(|(key, &value)| {
-    //             if value {
-    //                 Some(get_modifier_by_name(key.as_str()))
-    //             } else {
-    //                 None
-    //             }
-    //         })
-    //         .collect()
-    // }
-
     #[inline]
     pub fn modifiers(&self) -> &IndexMap<String, bool> {
         &self.modifiers
@@ -100,10 +64,6 @@ impl Manifest {
     pub fn target_version(&self) -> &TargetVersion {
         &self.target_version
     }
-
-    // pub fn generator(&self) -> &GeneratorParameters {
-    //     &self.generator
-    // }
 
     #[inline]
     pub fn extension(&self) -> &Option<String> {

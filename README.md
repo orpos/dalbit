@@ -12,7 +12,7 @@ This project is still in W.I.P
 - [x] Add tests for polyfills.
 - [ ] Add tests for transpilation. (to ensure the same results in lua and luau)
 - [ ] Add tests for dal internally.
-- [ ] Add logging for dal internally for debug.
+- [x] Add logging for dal internally for debug.
 - [x] `convert_bit32` modifier now converts `bit32.btest`.
 - [x] Add comments for docs and code readability. (WIP)
 - [x] Optimize polyfill.

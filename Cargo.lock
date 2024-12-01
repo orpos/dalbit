@@ -366,6 +366,7 @@ dependencies = [
 name = "dal"
 version = "0.1.0"
 dependencies = [
+ "anstyle",
  "anyhow",
  "async-trait",
  "auth-git2",
@@ -374,6 +375,7 @@ dependencies = [
  "darklua-demo",
  "dirs",
  "durationfmt",
+ "env_logger",
  "fs-err",
  "full_moon",
  "git2",

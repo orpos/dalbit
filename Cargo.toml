@@ -3,6 +3,9 @@ name = "dal"
 version = "0.1.0"
 edition = "2021"
 
+[badges]
+github = { repository = "CavefulGames/dal" }
+
 [lib]
 name = "dal_core"
 path = "src/lib/mod.rs"
@@ -35,3 +38,5 @@ durationfmt = "0.1.1"
 async-trait = "0.1.83"
 full_moon = { version = "1.1.2", features = ["luau", "lua53"] }
 darklua-demo = "3.2.1"
+env_logger = "0.11.5"
+anstyle = "1.0.10"

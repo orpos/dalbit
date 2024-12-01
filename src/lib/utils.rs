@@ -1,7 +1,7 @@
 use std::{collections::HashSet, path::PathBuf};
 
 use anyhow::{anyhow, Result};
-use full_moon::ast::{Ast, Expression, Field, LastStmt};
+use full_moon::{ast::{Ast, Expression, Field, LastStmt}, tokenizer::TokenKind};
 use tokio::fs;
 
 use crate::TargetVersion;
@@ -49,7 +49,13 @@ pub async fn get_exports_from_last_stmt(target: &ParseTarget) -> Result<Option<H
                         value: _,
                     } => {
                         if let Expression::String(string_token) = key {
-                            Some(string_token.to_string())
+                            let string_token = string_token.token();
+                            if let TokenKind::StringLiteral = string_token.token_kind() {
+                                log::debug!("[get_exports_from_last_stmt] ExpressionKey token kind: {:?} string: {}", string_token.token_kind(), string_token.to_string());
+                                Some(string_token.to_string().trim().to_owned())
+                            } else {
+                                None
+                            }
                         } else {
                             None
                         }
@@ -58,7 +64,15 @@ pub async fn get_exports_from_last_stmt(target: &ParseTarget) -> Result<Option<H
                         key,
                         equal: _,
                         value: _,
-                    } => Some(key.to_string()),
+                    } => {
+                        let key = key.token();
+                        if let TokenKind::Identifier = key.token_kind() {
+                            log::debug!("[get_exports_from_last_stmt] NameKey token kind: {:?} string: {}", key.token_kind(), key.to_string());
+                            Some(key.to_string().trim().to_owned())
+                        } else {
+                            None
+                        }
+                    }
                     _ => None,
                 } {
                     exports.insert(new_export);

@@ -16,6 +16,7 @@ pub enum TargetVersion {
     Lua51,
     Lua52,
     Lua53,
+	Luau,
     Default,
 }
 
@@ -25,6 +26,7 @@ impl TargetVersion {
             TargetVersion::Lua51 => LuaVersion::lua51(),
             TargetVersion::Lua52 => LuaVersion::lua52(),
             TargetVersion::Lua53 => LuaVersion::lua53(),
+			TargetVersion::Luau => LuaVersion::luau(),
             TargetVersion::Default => LuaVersion::default(),
         }
     }

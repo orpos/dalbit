@@ -17,6 +17,28 @@ use url::Url;
 use crate::manifest::WritableManifest;
 use crate::{utils, TargetVersion};
 
+/// Cleans cache from polyfill repository url.
+pub async fn clean_cache(url: &Url) -> Result<()> {
+    let index_path = index_path(url)?;
+    fs::remove_dir_all(index_path).await?;
+    Ok(())
+}
+
+/// Cleans every caches of polyfill.
+pub async fn clean_cache_all() -> Result<()> {
+    let path = cache_dir()?;
+    fs::remove_dir_all(path).await?;
+    Ok(())
+}
+
+/// Gets cache directory path of polyfills.
+pub fn cache_dir() -> Result<PathBuf> {
+    Ok(dirs::cache_dir()
+        .ok_or_else(|| anyhow!("could not find cache directory"))?
+        .join("dal")
+        .join("polyfills"))
+}
+
 /// Polyfill's manifest (`/polyfill.toml` in a polyfill repository)
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Manifest {
@@ -67,17 +89,16 @@ fn index_path(url: &Url) -> anyhow::Result<PathBuf> {
     let hash_hex = hex::encode(&hash.as_bytes()[..8]);
     let ident = format!("{}-{}", name, hash_hex);
 
-    let path = dirs::cache_dir()
-        .ok_or_else(|| anyhow!("could not find cache directory"))?
-        .join("dal")
-        .join("polyfills")
+    let path = cache_dir()?
         .join(ident);
+
+    log::debug!("index path {:?}", path);
 
     Ok(path)
 }
 
 impl Polyfill {
-	/// Creates a new polyfill from git repository.
+    /// Creates a new polyfill from git repository.
     pub async fn new(url: &Url) -> Result<Self> {
         let path = index_path(url)?;
         let repository = match Repository::open(path.as_path()) {
@@ -95,19 +116,25 @@ impl Polyfill {
             }
         };
 
+        log::info!("repository is ready");
+
         //let manifest = Manifest::from_file(path.join("polyfill.toml")).await?;
         let manifest_content = fs::read_to_string(path.join("polyfill.toml")).await?;
         let manifest: Manifest = toml::from_str(&manifest_content)?;
 
-        let globals_ast = utils::parse_file(&manifest.globals, &manifest.lua_version).await?;
+        let globals_path = path.join(&manifest.globals);
+        log::debug!("globals path {:?}", globals_path);
+        let globals_ast = utils::parse_file(&globals_path, &manifest.lua_version).await?;
         let exports = utils::get_exports_from_last_stmt(&utils::ParseTarget::FullMoonAst(globals_ast))
             .await?
             .ok_or_else(|| anyhow!("Invalid polyfill structure. Polyfills' globals must return at least one global in a table."))?;
 
         let globals = Globals {
-            path: manifest.globals,
+            path: globals_path,
             exports,
         };
+
+        log::info!("polyfill ready");
 
         Ok(Self {
             path,
@@ -118,7 +145,7 @@ impl Polyfill {
         })
     }
 
-	/// Fetches and updates polyfill repository using git.
+    /// Fetches and updates polyfill repository using git.
     pub fn fetch(&self) -> Result<()> {
         let mut remote = self.repository.find_remote("origin")?;
         let auth = GitAuthenticator::new();
@@ -142,10 +169,6 @@ impl Polyfill {
 
         Ok(())
     }
-
-    // pub async fn create_injector(file_path: &PathBuf) -> Result<Injector> {
-
-    // }
 
     #[inline]
     pub fn path(&self) -> &PathBuf {

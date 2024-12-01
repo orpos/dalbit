@@ -138,65 +138,6 @@ impl Transpiler {
         utils::parse_file(path, &self.target_version).await
     }
 
-    // pub async fn inject_library(
-    //     &self,
-    //     file_path: &PathBuf,
-    //     module_path: &PathBuf,
-    //     libraries: &IndexMap<String, bool>,
-    //     removes: &Option<Vec<String>>,
-    // ) -> Result<()> {
-    //     let parent = file_path
-    //         .parent()
-    //         .ok_or(anyhow!("File path must have parent path"))?;
-    //     let require_path = diff_paths(module_path, parent)
-    //         .ok_or(anyhow!("Couldn't resolve the require path"))?
-    //         .with_extension("");
-    //     let require_path = make_relative(&require_path).to_path_buf();
-
-    //     let code = fs::read_to_string(file_path).await?;
-
-    //     let mut lines: Vec<String> = code.lines().map(String::from).collect();
-    //     let mut libraries_texts: Vec<String> = Vec::new();
-
-    //     let ast = full_moon::parse_fallible(
-    //         code.as_str(),
-    //         (&self.target_version).to_lua_version().clone(),
-    //     )
-    //     .into_result()
-    //     .map_err(|errors| anyhow!("{:?}", errors))?;
-
-    //     let mut collect_used_libs = CollectUsedLibraries::new(libraries.clone());
-    //     collect_used_libs.visit_ast(&ast);
-
-    //     for lib in collect_used_libs.used_libraries {
-    //         libraries_texts.push(format!(
-    //             "local {}=require'{}'.{} ",
-    //             lib,
-    //             require_path.to_slash_lossy(),
-    //             lib
-    //         ));
-    //     }
-
-    //     if let Some(removes) = removes {
-    //         for lib in removes {
-    //             libraries_texts.push(format!("local {}=nil ", lib));
-    //         }
-    //     }
-
-    //     let libraries_text = libraries_texts.join("");
-    //     if let Some(first_line) = lines.get_mut(0) {
-    //         first_line.insert_str(0, &libraries_text);
-    //     } else {
-    //         lines.push(libraries_text);
-    //     }
-
-    //     let new_content = lines.join("\n");
-
-    //     fs::write(file_path, new_content).await?;
-
-    //     Ok(())
-    // }
-
     async fn private_process(
         &self,
         input: PathBuf,
@@ -309,8 +250,8 @@ impl Transpiler {
                 additional_modifiers.push(Modifier::DarkluaRule(Box::new(inject_global_value)));
             }
 
-            let mut output_iter = output_files.iter();
-            if let Some(first_output) = output_iter.next() {
+            if let Some(first_output) = output_files.first() {
+				log::debug!("first output found!");
                 let extension = if let Some(extension) = &self.extension {
                     extension.to_owned()
                 } else {
@@ -341,6 +282,8 @@ impl Transpiler {
                         )
                         .await?;
 
+					log::info!("[injector] exports to inject: {:?}", polyfill.globals().exports().to_owned());
+
                     let injector = Injector::new(
                         module_path,
                         polyfill.globals().exports().to_owned(),
@@ -348,50 +291,11 @@ impl Transpiler {
                         polyfill.removes().to_owned(),
                     );
 
-                    for source_path in output_iter {
+                    for source_path in &output_files {
                         injector.inject(source_path).await?
                     }
                 }
             }
-
-            // for (index, output_path) in output_files.iter().enumerate() {
-            //     if let Some(parent) = output_path.parent() {
-            //         let mut module_path: Option<PathBuf> = None;
-            //         if index == 0 {
-            //             let extension = if let Some(extension) = &self.extension {
-            //                 extension.to_owned()
-            //             } else {
-            //                 output_path
-            //                     .extension()
-            //                     .unwrap()
-            //                     .to_string_lossy()
-            //                     .into_owned()
-            //             };
-            //             module_path = Some(
-            //                 parent
-            //                     .join(DEFAULT_INJECTED_LIB_FILE_NAME)
-            //                     .with_extension(extension),
-            //             );
-            //             let _ = self
-            //                 .private_process(
-            //                     polyfill_path.join(polyfill.globals()),
-            //                     module_path.to_owned().unwrap(),
-            //                     Some(&mut additional_modifiers),
-            //                     true,
-            //                 )
-            //                 .await?;
-            //         }
-            //         if let Some(module_path) = module_path {
-            //             self.inject_library(
-            //                 &output_path,
-            //                 &module_path,
-            //                 polyfill_config.libraries(),
-            //                 polyfill.removes(),
-            //             )
-            //             .await?;
-            //         }
-            //     }
-            // }
 
             Ok(())
         } else {

@@ -102,6 +102,7 @@ impl Injector {
         collect_used_libs.visit_ast(&ast);
 
         for lib in collect_used_libs.used_libraries {
+			log::debug!("used library: {}", lib);
             libraries_texts.push(format!(
                 "local {}=require'{}'.{} ",
                 lib,
@@ -124,6 +125,8 @@ impl Injector {
         }
 
         let new_content = lines.join("\n");
+
+		log::debug!("injected source path: {:?}", source_path);
 
         fs::write(source_path, new_content).await?;
 
