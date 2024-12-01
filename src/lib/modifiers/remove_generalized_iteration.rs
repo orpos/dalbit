@@ -10,7 +10,7 @@ use super::runtime_identifier::RuntimeIdentifierBuilder;
 use darklua_core::rules::{Rule, RuleProcessResult};
 
 const METATABLE_VARIABLE_NAME: &str = "m";
-const SETMETATABLE_IDENTIFIER: &str = "__DAL_setmetatable_iter";
+const GETMETATABLE_IDENTIFIER: &str = "__DAL_getmetatable_iter";
 
 struct Processor {
     iterator_identifier: String,
@@ -74,7 +74,7 @@ impl Processor {
                     let mt_identifier = mt_typed_identifier.get_identifier().clone();
 
                     let get_mt_call = FunctionCall::new(
-                        Prefix::from_name(SETMETATABLE_IDENTIFIER),
+                        Prefix::from_name(GETMETATABLE_IDENTIFIER),
                         TupleArguments::new(vec![iterator_exp.clone()]).into(),
                         None,
                     );
