@@ -18,6 +18,8 @@ impl FetchCommand {
             polyfill_cache.fetch()?;
         }
 
+        // TO-DO: Is fetched polyfill already latest version?
+
         return Ok(ExitCode::SUCCESS);
     }
 }

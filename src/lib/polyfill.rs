@@ -46,8 +46,10 @@ pub fn cache_dir() -> Result<PathBuf> {
 pub struct Polyfill {
     repository: Url,
     #[serde(skip_serializing_if = "HashMap::is_empty")]
+    #[serde(default)]
     globals: HashMap<String, bool>,
     #[serde(skip_serializing_if = "HashMap::is_empty")]
+    #[serde(default)]
     config: HashMap<String, bool>,
 }
 
