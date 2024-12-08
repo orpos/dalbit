@@ -1,7 +1,7 @@
 use anyhow::Result;
 use indexmap::IndexMap;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use tokio::fs;
 
 use crate::{polyfill::Polyfill, TargetVersion};
@@ -28,9 +28,7 @@ pub trait WritableManifest: Send + Sized + Serialize + DeserializeOwned {
 /// Manifest for dal transpiler. This is a writable manifest.
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Manifest {
-    #[serde(skip_serializing_if = "default")]
     input: PathBuf,
-    #[serde(skip_serializing_if = "default")]
     output: PathBuf,
     file_extension: Option<String>,
     target_version: TargetVersion,
@@ -42,10 +40,6 @@ pub struct Manifest {
     polyfills: Vec<Polyfill>,
 }
 
-fn default<T: Default + PartialEq>(t: &T) -> bool {
-    *t == Default::default()
-}
-
 fn default_injected_polyfill_name() -> String {
     DEFAULT_INJECTED_POLYFILL_NAME.to_owned()
 }
@@ -53,8 +47,8 @@ fn default_injected_polyfill_name() -> String {
 impl Default for Manifest {
     fn default() -> Self {
         Self {
-            output: PathBuf::default(),
-            input: PathBuf::default(),
+            input: Path::new("output.luau").to_owned(),
+            output: Path::new("input.lua").to_owned(),
             file_extension: Some("lua".to_owned()),
             target_version: TargetVersion::Lua53,
             injected_polyfill_name: DEFAULT_INJECTED_POLYFILL_NAME.to_owned(),
