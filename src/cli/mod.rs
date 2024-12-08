@@ -3,18 +3,17 @@ use std::process::ExitCode;
 use anyhow::Result;
 use clap::{Args, Parser, Subcommand};
 
+mod clean;
 mod fetch;
 mod init;
 mod transpile;
-mod clean;
 
+use clean::CleanCommand;
 use fetch::FetchCommand;
 use init::InitCommand;
 use log::LevelFilter;
 use transpile::TranspileCommand;
-use clean::CleanCommand;
 
-pub const DEFAULT_POLYFILL_URL: &str = "https://github.com/CavefulGames/dal-polyfill";
 pub const DEFAULT_MANIFEST_PATH: &str = "dal.toml";
 
 #[derive(Debug, Clone, Subcommand)]
@@ -22,7 +21,7 @@ pub enum CliSubcommand {
     Transpile(TranspileCommand),
     Init(InitCommand),
     Fetch(FetchCommand),
-	Clean(CleanCommand),
+    Clean(CleanCommand),
 }
 
 #[derive(Debug, Args, Clone)]
@@ -47,7 +46,7 @@ impl GlobalOptions {
 #[derive(Parser, Debug, Clone)]
 #[command(version, about, long_about = None)]
 pub struct Dal {
-	#[command(flatten)]
+    #[command(flatten)]
     global_options: GlobalOptions,
     #[clap(subcommand)]
     subcommand: CliSubcommand,
@@ -59,11 +58,11 @@ impl Dal {
             CliSubcommand::Transpile(cmd) => cmd.run().await,
             CliSubcommand::Init(cmd) => cmd.run().await,
             CliSubcommand::Fetch(cmd) => cmd.run().await,
-			CliSubcommand::Clean(cmd) => cmd.run().await,
+            CliSubcommand::Clean(cmd) => cmd.run().await,
         }
     }
 
-	pub fn get_log_level_filter(&self) -> LevelFilter {
+    pub fn get_log_level_filter(&self) -> LevelFilter {
         self.global_options.get_log_level_filter()
     }
 }

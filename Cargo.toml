@@ -14,6 +14,9 @@ path = "src/lib/mod.rs"
 name = "dal"
 path = "src/main.rs"
 
+[profile.dev.package.full_moon]
+opt-level = 3
+
 [dependencies]
 anyhow = "1.0.89"
 auth-git2 = "0.5.5"
@@ -29,9 +32,8 @@ strum = "0.26.3"
 strum_macros = "0.26.4"
 tokio = { version = "1.40.0", features = ["full"] }
 toml = "0.8.19"
-url = "2.5.2"
+url = { version = "2.5.2", features = ["serde"] }
 log = "0.4.21"
-indexmap = { version = "2.6.0", features = ["serde"] }
 pathdiff = "0.2.2"
 path-slash = "0.2.1"
 durationfmt = "0.1.1"
@@ -40,3 +42,4 @@ full_moon = { version = "1.1.2", features = ["luau", "lua53"] }
 darklua-demo = "3.2.1"
 env_logger = "0.11.5"
 anstyle = "1.0.10"
+indexmap = { version = "2.7.0", features = ["serde"] }

@@ -8,7 +8,7 @@ use url::Url;
 /// Clean dal polyfills cache
 #[derive(Debug, Clone, Parser)]
 pub struct CleanCommand {
-    repo: Option<Url>
+    repo: Option<Url>,
 }
 
 impl CleanCommand {
@@ -18,6 +18,8 @@ impl CleanCommand {
         } else {
             polyfill::clean_cache_all().await?;
         }
+
+        println!("Successfully cleaned polyfill caches");
 
         return Ok(ExitCode::SUCCESS);
     }

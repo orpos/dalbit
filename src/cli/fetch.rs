@@ -1,11 +1,10 @@
-use std::{process::ExitCode, str::FromStr};
+use std::process::ExitCode;
 
 use anyhow::Result;
 use clap::Parser;
-use dal_core::polyfill::Polyfill;
-use url::Url;
+use dal_core::manifest::{Manifest, WritableManifest};
 
-use super::DEFAULT_POLYFILL_URL;
+use super::DEFAULT_MANIFEST_PATH;
 
 /// Fetch dal polyfills
 #[derive(Debug, Clone, Parser)]
@@ -13,8 +12,11 @@ pub struct FetchCommand {}
 
 impl FetchCommand {
     pub async fn run(self) -> Result<ExitCode> {
-        let polyfill = Polyfill::new(&Url::from_str(DEFAULT_POLYFILL_URL)?).await?;
-        polyfill.fetch()?;
+        let manifest = Manifest::from_file(DEFAULT_MANIFEST_PATH).await?;
+        for polyfill in manifest.polyfills() {
+            let polyfill_cache = polyfill.cache().await?;
+            polyfill_cache.fetch()?;
+        }
 
         return Ok(ExitCode::SUCCESS);
     }

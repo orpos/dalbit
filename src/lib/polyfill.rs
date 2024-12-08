@@ -6,16 +6,18 @@ use dirs;
 use fs_err;
 use git2::Repository;
 use hex;
-use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::io;
 use std::path::PathBuf;
+use std::str::FromStr;
 use tokio::fs;
 use url::Url;
 
 use crate::manifest::WritableManifest;
 use crate::{utils, TargetVersion};
+
+pub const DEFAULT_POLYFILL_URL: &str = "https://github.com/CavefulGames/dal-polyfill";
 
 /// Cleans cache from polyfill repository url.
 pub async fn clean_cache(url: &Url) -> Result<()> {
@@ -39,16 +41,56 @@ pub fn cache_dir() -> Result<PathBuf> {
         .join("polyfills"))
 }
 
+/// Polyfill-related manifest.
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Polyfill {
+    repository: Url,
+    globals: HashMap<String, bool>,
+    config: HashMap<String, bool>,
+}
+
+impl Default for Polyfill {
+    fn default() -> Self {
+        Self {
+            repository: Url::from_str(DEFAULT_POLYFILL_URL).unwrap(),
+            globals: HashMap::new(),
+            config: HashMap::new(),
+        }
+    }
+}
+
+impl Polyfill {
+    /// Loads polyfill cache.
+    pub async fn cache(&self) -> Result<PolyfillCache> {
+        PolyfillCache::new(&self.repository).await
+    }
+
+    #[inline]
+    pub fn repository(&self) -> &Url {
+        &self.repository
+    }
+
+    #[inline]
+    pub fn globals(&self) -> &HashMap<String, bool> {
+        &self.globals
+    }
+
+    #[inline]
+    pub fn config(&self) -> &HashMap<String, bool> {
+        &self.config
+    }
+}
+
 /// Polyfill's manifest (`/polyfill.toml` in a polyfill repository)
 #[derive(Debug, Deserialize, Serialize)]
-pub struct Manifest {
+pub struct PolyfillManifest {
     globals: PathBuf,
     removes: Option<Vec<String>>,
-    config: IndexMap<String, bool>,
+    config: HashMap<String, bool>,
     lua_version: TargetVersion,
 }
 
-impl WritableManifest for Manifest {}
+impl WritableManifest for PolyfillManifest {}
 
 /// Polyfill's globals.
 #[derive(Debug)]
@@ -57,25 +99,13 @@ pub struct Globals {
     exports: HashSet<String>,
 }
 
-impl Globals {
-    #[inline]
-    pub fn path(&self) -> &PathBuf {
-        &self.path
-    }
-
-    #[inline]
-    pub fn exports(&self) -> &HashSet<String> {
-        &self.exports
-    }
-}
-
-/// Represents a polyfill structure.
-pub struct Polyfill {
+/// Represents a loaded polyfill cache.
+pub struct PolyfillCache {
     repository: Repository,
     path: PathBuf,
     globals: Globals,
     removes: Option<Vec<String>>,
-    config: IndexMap<String, bool>,
+    config: HashMap<String, bool>,
 }
 
 fn index_path(url: &Url) -> anyhow::Result<PathBuf> {
@@ -89,15 +119,14 @@ fn index_path(url: &Url) -> anyhow::Result<PathBuf> {
     let hash_hex = hex::encode(&hash.as_bytes()[..8]);
     let ident = format!("{}-{}", name, hash_hex);
 
-    let path = cache_dir()?
-        .join(ident);
+    let path = cache_dir()?.join(ident);
 
     log::debug!("index path {:?}", path);
 
     Ok(path)
 }
 
-impl Polyfill {
+impl PolyfillCache {
     /// Creates a new polyfill from git repository.
     pub async fn new(url: &Url) -> Result<Self> {
         let path = index_path(url)?;
@@ -120,7 +149,7 @@ impl Polyfill {
 
         //let manifest = Manifest::from_file(path.join("polyfill.toml")).await?;
         let manifest_content = fs::read_to_string(path.join("polyfill.toml")).await?;
-        let manifest: Manifest = toml::from_str(&manifest_content)?;
+        let manifest: PolyfillManifest = toml::from_str(&manifest_content)?;
 
         let globals_path = path.join(&manifest.globals);
         log::debug!("globals path {:?}", globals_path);
@@ -176,8 +205,13 @@ impl Polyfill {
     }
 
     #[inline]
-    pub fn globals(&self) -> &Globals {
-        &self.globals
+    pub fn globals_path(&self) -> &PathBuf {
+        &self.globals.path
+    }
+
+    #[inline]
+    pub fn globals_exports(&self) -> &HashSet<String> {
+        &self.globals.exports
     }
 
     #[inline]
@@ -186,7 +220,7 @@ impl Polyfill {
     }
 
     #[inline]
-    pub fn config(&self) -> &IndexMap<String, bool> {
+    pub fn config(&self) -> &HashMap<String, bool> {
         &self.config
     }
 }

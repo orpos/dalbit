@@ -1,7 +1,10 @@
 use std::{collections::HashSet, path::PathBuf};
 
 use anyhow::{anyhow, Result};
-use full_moon::{ast::{Ast, Expression, Field, LastStmt}, tokenizer::TokenKind};
+use full_moon::{
+    ast::{Ast, Expression, Field, LastStmt},
+    tokenizer::TokenKind,
+};
 use tokio::fs;
 
 use crate::TargetVersion;

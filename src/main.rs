@@ -1,42 +1,58 @@
-use std::{process::ExitCode, thread};
+use std::process::ExitCode;
 
 mod cli;
 
+use anstyle::{AnsiColor, Color, Style};
 use clap::Parser;
 use cli::Dal;
 pub use dal_core;
-use tokio::runtime;
-use anstyle::{AnsiColor, Color, Style};
 use env_logger::Builder;
 use log::Level;
 
-const STACK_SIZE: usize = 4 * 1024 * 1024;
+// const STACK_SIZE: usize = 4 * 1024 * 1024;
 
-fn run() -> ExitCode {
-    let rt = runtime::Builder::new_multi_thread().build().unwrap();
+// fn run() -> ExitCode {
+//     let rt = runtime::Builder::new_multi_thread().build().unwrap();
 
+//     let dal = Dal::parse();
+
+//     let filter = dal.get_log_level_filter();
+
+//     formatted_logger().filter_module("dal", filter).init();
+
+//     match rt.block_on(dal.run()) {
+//         Ok(code) => code,
+//         Err(err) => {
+//             eprintln!("{:?}", err);
+//             ExitCode::FAILURE
+//         }
+//     }
+// }
+
+// fn main() -> ExitCode {
+//     let child = thread::Builder::new()
+//         .stack_size(STACK_SIZE)
+//         .spawn(run)
+//         .unwrap();
+
+//     child.join().unwrap()
+// }
+
+#[tokio::main(flavor = "multi_thread")]
+async fn main() -> ExitCode {
     let dal = Dal::parse();
 
     let filter = dal.get_log_level_filter();
 
     formatted_logger().filter_module("dal", filter).init();
 
-    match rt.block_on(dal.run()) {
+    match dal.run().await {
         Ok(code) => code,
         Err(err) => {
             eprintln!("{:?}", err);
             ExitCode::FAILURE
         }
     }
-}
-
-fn main() -> ExitCode {
-    let child = thread::Builder::new()
-        .stack_size(STACK_SIZE)
-        .spawn(run)
-        .unwrap();
-
-    child.join().unwrap()
 }
 
 fn formatted_logger() -> Builder {

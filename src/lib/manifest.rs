@@ -1,10 +1,12 @@
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use indexmap::IndexMap;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use std::path::PathBuf;
 use tokio::fs;
 
-use crate::TargetVersion;
+use crate::{polyfill::Polyfill, TargetVersion};
+
+pub const DEFAULT_INJECTED_POLYFILL_NAME: &str = "__polyfill__";
 
 #[async_trait::async_trait]
 pub trait WritableManifest: Send + Sized + Serialize + DeserializeOwned {
@@ -23,29 +25,42 @@ pub trait WritableManifest: Send + Sized + Serialize + DeserializeOwned {
     }
 }
 
-/// Manifest for dal transpiler.
+/// Manifest for dal transpiler. This is a writable manifest.
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Manifest {
-    output: Option<PathBuf>,
-    input: Option<PathBuf>,
+    #[serde(skip_serializing_if = "default")]
+    input: PathBuf,
+    #[serde(skip_serializing_if = "default")]
+    output: PathBuf,
     file_extension: Option<String>,
     target_version: TargetVersion,
+    #[serde(default = "default_injected_polyfill_name")]
+    injected_polyfill_name: String,
     pub minify: bool,
     modifiers: IndexMap<String, bool>,
-    globals: IndexMap<String, bool>,
+    #[serde(rename = "polyfill")]
+    polyfills: Vec<Polyfill>,
+}
+
+fn default<T: Default + PartialEq>(t: &T) -> bool {
+    *t == Default::default()
+}
+
+fn default_injected_polyfill_name() -> String {
+    DEFAULT_INJECTED_POLYFILL_NAME.to_owned()
 }
 
 impl Default for Manifest {
     fn default() -> Self {
         Self {
-            output: None,
-            input: None,
+            output: PathBuf::default(),
+            input: PathBuf::default(),
             file_extension: Some("lua".to_owned()),
             target_version: TargetVersion::Lua53,
+            injected_polyfill_name: DEFAULT_INJECTED_POLYFILL_NAME.to_owned(),
             minify: true,
-            // generator: GeneratorParameters::RetainLines,
             modifiers: IndexMap::new(),
-            globals: IndexMap::new(),
+            polyfills: vec![Polyfill::default()],
         }
     }
 }
@@ -53,6 +68,21 @@ impl Default for Manifest {
 impl WritableManifest for Manifest {}
 
 impl Manifest {
+    #[inline]
+    pub fn input(&self) -> &PathBuf {
+        &self.input
+    }
+
+    #[inline]
+    pub fn output(&self) -> &PathBuf {
+        &self.output
+    }
+
+    #[inline]
+    pub fn file_extension(&self) -> &Option<String> {
+        &self.file_extension
+    }
+
     #[inline]
     pub fn modifiers(&self) -> &IndexMap<String, bool> {
         &self.modifiers
@@ -64,21 +94,12 @@ impl Manifest {
     }
 
     #[inline]
-    pub fn extension(&self) -> &Option<String> {
-        &self.file_extension
+    pub fn injected_polyfill_name(&self) -> &String {
+        &self.injected_polyfill_name
     }
 
     #[inline]
-    pub fn require_input(&self, replacement: Option<PathBuf>) -> Result<PathBuf> {
-        replacement
-            .or(self.input.clone())
-            .ok_or_else(|| anyhow!("Error: 'inputs' is required but not provided."))
-    }
-
-    #[inline]
-    pub fn require_output(&self, replacement: Option<PathBuf>) -> Result<PathBuf> {
-        replacement
-            .or(self.output.clone())
-            .ok_or_else(|| anyhow!("Error: 'output' is required but not provided."))
+    pub fn polyfills(&self) -> &Vec<Polyfill> {
+        &self.polyfills
     }
 }

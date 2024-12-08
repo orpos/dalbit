@@ -52,13 +52,13 @@ impl Processor {
                         TypedIdentifier::new(self.control_identifier.as_str());
                     let control_identifier = control_typed_identifier.get_identifier().clone();
 
-                    let iterator_local_assign = LocalAssignStatement::new(
-                        vec![iterator_typed_identifier],
+                    let iter_invar_control_local_assign = LocalAssignStatement::new(
+                        vec![
+                            iterator_typed_identifier,
+                            invariant_typed_identifier,
+                            control_typed_identifier,
+                        ],
                         vec![exps[0].to_owned()],
-                    );
-                    let invar_control_local_assign = LocalAssignStatement::new(
-                        vec![invariant_typed_identifier, control_typed_identifier],
-                        Vec::new(),
                     );
 
                     let iterator_exp = Expression::Identifier(iterator_identifier.clone());
@@ -102,18 +102,19 @@ impl Processor {
                         vec![mt_iter_call.into()],
                     );
 
-                    let pairs_call = FunctionCall::new(
-                        Prefix::from_name("pairs"),
-                        TupleArguments::new(vec![iterator_identifier.clone().into()]).into(),
-                        None,
-                    );
+                    // let pairs_call = FunctionCall::new(
+                    //     Prefix::from_name("pairs"),
+                    //     TupleArguments::new(vec![iterator_identifier.clone().into()]).into(),
+                    //     None,
+                    // );
+
                     let assign_from_pairs = AssignStatement::new(
                         vec![
-                            Variable::Identifier(iterator_identifier),
+                            Variable::Identifier(iterator_identifier.clone()),
                             Variable::Identifier(invariant_identifier),
                             Variable::Identifier(control_identifier),
                         ],
-                        vec![pairs_call.into()],
+                        vec![Identifier::new("next").into(), iterator_identifier.into()],
                     );
 
                     let if_mt_table_block = Block::new(vec![assign_from_iter.into()], None);
@@ -135,8 +136,7 @@ impl Processor {
                         IfBranch::new(Expression::Binary(if_table_condition), if_table_block);
                     let if_table_stmt = IfStatement::new(vec![if_table_branch], None);
 
-                    stmts.push(iterator_local_assign.into());
-                    stmts.push(invar_control_local_assign.into());
+                    stmts.push(iter_invar_control_local_assign.into());
                     stmts.push(if_table_stmt.into());
                     stmts.push(generic_for.clone().into());
 
