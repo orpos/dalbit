@@ -47,8 +47,8 @@ fn default_injected_polyfill_name() -> String {
 impl Default for Manifest {
     fn default() -> Self {
         Self {
-            input: Path::new("output.luau").to_owned(),
-            output: Path::new("input.lua").to_owned(),
+            input: Path::new("input.luau").to_owned(),
+            output: Path::new("output.lua").to_owned(),
             file_extension: Some("lua".to_owned()),
             target_version: TargetVersion::Lua53,
             injected_polyfill_name: DEFAULT_INJECTED_POLYFILL_NAME.to_owned(),
