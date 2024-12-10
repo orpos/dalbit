@@ -363,37 +363,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "dal"
-version = "0.1.0"
-dependencies = [
- "anstyle",
- "anyhow",
- "async-trait",
- "auth-git2",
- "blake3",
- "clap",
- "darklua-demo",
- "dirs",
- "durationfmt",
- "env_logger",
- "fs-err",
- "full_moon",
- "git2",
- "hex",
- "indexmap 2.7.0",
- "log",
- "path-slash",
- "pathdiff",
- "serde",
- "strfmt",
- "strum",
- "strum_macros",
- "tokio",
- "toml",
- "url",
-]
-
-[[package]]
 name = "darklua-demo"
 version = "3.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -916,6 +885,37 @@ dependencies = [
  "pest",
  "pest_derive",
  "serde",
+]
+
+[[package]]
+name = "kaledis_dalbit"
+version = "0.1.0"
+dependencies = [
+ "anstyle",
+ "anyhow",
+ "async-trait",
+ "auth-git2",
+ "blake3",
+ "clap",
+ "darklua-demo",
+ "dirs",
+ "durationfmt",
+ "env_logger",
+ "fs-err",
+ "full_moon",
+ "git2",
+ "hex",
+ "indexmap 2.7.0",
+ "log",
+ "path-slash",
+ "pathdiff",
+ "serde",
+ "strfmt",
+ "strum",
+ "strum_macros",
+ "tokio",
+ "toml",
+ "url",
 ]
 
 [[package]]

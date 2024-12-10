@@ -42,7 +42,7 @@ pub fn cache_dir() -> Result<PathBuf> {
 }
 
 /// Polyfill-related manifest.
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Polyfill {
     repository: Url,
     #[serde(skip_serializing_if = "HashMap::is_empty")]

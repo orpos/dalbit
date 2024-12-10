@@ -26,18 +26,19 @@ pub trait WritableManifest: Send + Sized + Serialize + DeserializeOwned {
 }
 
 /// Manifest for dal transpiler. This is a writable manifest.
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Manifest {
-    input: PathBuf,
-    output: PathBuf,
-    file_extension: Option<String>,
-    target_version: TargetVersion,
+    pub input: PathBuf,
+    pub output: PathBuf,
+    pub file_extension: Option<String>,
+    pub target_version: TargetVersion,
     #[serde(default = "default_injected_polyfill_name")]
-    injected_polyfill_name: String,
+    pub injected_polyfill_name: String,
     pub minify: bool,
-    modifiers: IndexMap<String, bool>,
+    pub modifiers: IndexMap<String, bool>,
     #[serde(rename = "polyfill")]
-    polyfills: Vec<Polyfill>,
+    pub polyfills: Vec<Polyfill>,
+    pub bundle : bool,
 }
 
 fn default_injected_polyfill_name() -> String {
@@ -55,6 +56,7 @@ impl Default for Manifest {
             minify: true,
             modifiers: IndexMap::new(),
             polyfills: vec![Polyfill::default()],
+            bundle: false
         }
     }
 }

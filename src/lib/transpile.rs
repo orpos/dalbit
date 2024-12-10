@@ -157,7 +157,7 @@ async fn private_process(
 
 pub async fn process(manifest: Manifest) -> Result<()> {
     let output_files =
-        private_process(&manifest, manifest.input(), manifest.output(), None, false).await?;
+        private_process(&manifest, manifest.input(), manifest.output(), None, manifest.bundle).await?;
     for polyfill in manifest.polyfills() {
         let polyfill_cache = polyfill.cache().await?;
         let polyfill_config = polyfill_cache.config();
