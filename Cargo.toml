@@ -38,7 +38,6 @@ strum = "0.26.3"
 strum_macros = "0.26.4"
 tokio = { version = "1.40.0", features = ["full"] }
 toml = "0.8.19"
-url = { version = "2.5.2", features = ["serde"] }
 log = "0.4.21"
 pathdiff = "0.2.2"
 path-slash = "0.2.1"
@@ -49,3 +48,4 @@ darklua-demo = "3.2.1"
 env_logger = "0.11.5"
 anstyle = "1.0.10"
 indexmap = { version = "2.7.0", features = ["serde"] }
+url = { version = "2.5.4", features = ["serde"] }
