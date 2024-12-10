@@ -1,7 +1,13 @@
 [package]
 name = "dal"
 version = "0.1.0"
+authors = ["jeparlefrancais <jeparlefrancais21@gmail.com>", "jiwonz"]
 edition = "2021"
+description = "A Luau-to-Lua transpiler based on darklua"
+repository = "https://github.com/CavefulGames/dal"
+keywords = ["luau", "lua", "transpiler"]
+license = "MIT"
+readme = "README.md"
 
 [badges]
 github = { repository = "CavefulGames/dal" }

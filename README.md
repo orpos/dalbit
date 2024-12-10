@@ -18,7 +18,11 @@ This project is still in W.I.P
 - [x] Optimize polyfill.
 
 ## Installation
-Coming soon! (will be available at `rokit` and `crates.io`(for `cargo install`))
+
+### Using Cargo (from crates.io)
+```sh
+cargo install dal --locked
+```
 
 ## Usage
 
