@@ -1,6 +1,6 @@
 [package]
 name = "dalbit"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["jiwonz"]
 edition = "2021"
 description = "A Luau-to-Lua transpiler"
@@ -29,7 +29,6 @@ auth-git2 = "0.5.5"
 blake3 = "1.5.4"
 clap = { version = "4.5.20", features = ["derive"] }
 dirs = "5.0.1"
-git2 = "0.19.0"
 hex = "0.4.3"
 serde = { version = "1.0.214", features = ["derive"] }
 strfmt = "0.2.4"
@@ -49,3 +48,7 @@ anstyle = "1.0.10"
 indexmap = { version = "2.7.0", features = ["serde"] }
 url = { version = "2.5.4", features = ["serde"] }
 fs-err = "3.0.0"
+
+[dependencies.git2]
+features = ["vendored-openssl"]
+version = "*"
