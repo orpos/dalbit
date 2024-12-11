@@ -1,4 +1,7 @@
-# Dalbit
+# [Dalbit](https://crates.io/crates/dalbit)
+
+<a href="https://discord.gg/ATVVsNNv3u"><img alt="Discord" src="https://img.shields.io/discord/385151591524597761?style=plastic&logo=discord&color=%235865F2" /></a>
+
 Dalbit(달빛) is a Luau-to-Lua transpiler, designed specifically for `Lua 5.3`.
 
 ## TO-DOs
@@ -16,7 +19,9 @@ Dalbit(달빛) is a Luau-to-Lua transpiler, designed specifically for `Lua 5.3`.
 
 ## Installation
 
-### Using Cargo (from crates.io)
+### [From Releases](https://github.com/CavefulGames/dalbit/releases)
+
+### Using Cargo (build from source)
 ```sh
 cargo install dalbit --locked
 ```
@@ -92,6 +97,9 @@ end end
 ## Why `darklua-demo` over `darklua`?
 - `darklua-demo` is a temporary fork to work properly with dal.
 - `darklua-demo` will be replaced by official `darklua` once darklua released with important features to work properly with dal.
+
+## Contributions
+Any issues, advices, and PRs for contribution are welcome!
 
 ## Special Thanks
 - [seaofvoices/darklua](https://github.com/seaofvoices/darklua) - Providing important and cool lua mutating rules.
