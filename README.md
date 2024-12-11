@@ -1,8 +1,8 @@
-# Dal
-Dal(달) is a Luau-to-Lua transpiler based on `darklua`, designed specifically for `Lua 5.3`.
+# [Dalbit](https://crates.io/crates/dalbit)
 
-## Note
-This project is still in W.I.P
+<a href="https://discord.gg/ATVVsNNv3u"><img alt="Discord" src="https://img.shields.io/discord/385151591524597761?style=plastic&logo=discord&color=%235865F2" /></a>
+
+Dalbit(달빛) is a Luau-to-Lua transpiler, designed specifically for `Lua 5.3`.
 
 ## TO-DOs
 - [x] Implement CLI.
@@ -11,106 +11,103 @@ This project is still in W.I.P
 - [x] Implement basic lua polyfills.
 - [x] Add tests for polyfills.
 - [ ] Add tests for transpilation. (to ensure the same results in lua and luau)
-- [ ] Add tests for dal internally.
-- [x] Add logging for dal internally for debug.
+- [ ] Add tests for dalbit internally.
+- [x] Add logging for dalbit internally for debug.
 - [x] `convert_bit32` modifier now converts `bit32.btest`.
 - [x] Add comments for docs and code readability. (WIP)
 - [x] Optimize polyfill.
 
 ## Installation
 
-### Using Cargo (from crates.io)
+### [From Releases](https://github.com/CavefulGames/dalbit/releases)
+
+### Using Cargo (build from source)
 ```sh
-cargo install dal --locked
+cargo install dalbit --locked
 ```
 
 ## Usage
 
 ### `init`
-Initializes dal manifest file in the current path.
+Initializes dalbit manifest file in the current path.
 ```sh
-dal init
+dalbit init
 ```
 
 ### `fetch`
 Fetches and updates lua polyfills.
-* This polyfill can be found [here](https://github.com/CavefulGames/dal-polyfill).
+* This polyfill can be found [here](https://github.com/CavefulGames/dalbit-polyfill).
 ```sh
-dal fetch
+dalbit fetch
 ```
 
 ### `transpile`
 Transpiles luau code to lua code.
 ```sh
-dal transpile [input] [output]
+dalbit transpile
+```
+
+### `clean`
+Cleans polyfill caches from disk.
+```sh
+dalbit clean
 ```
 
 ## Example
-### `dal.toml`
+### `dalbit.toml`
 ```toml
+input = "input.luau"
+output = "output.lua"
 file_extension = "lua"
 target_version = "lua53"
 minify = true
 
 [modifiers]
-convert_bit32 = true
 
-[globals]
+[polyfill]
+repository = "https://github.com/CavefulGames/dalbit-polyfill"
+injection_path = "__polyfill__"
 
 ```
 
 ### `inputs/input.luau`
 ```luau
-local log = math.log
-local floor = math.floor
-local x = bit32
-local band = x.band
-local rshift = x.rshift
-local lshift = x.lshift
-local bnot = x.bnot
-local bor = x.bor
-local t = table.create(1)
+local obj = { items = {1, 4, 9} }
+setmetatable(obj, { __iter = function(o) return next, o.items end })
 
-local function byteswap(n: number): number
-	return bor(bor(bor(lshift(n, 24), band(lshift(n, 8), 0xff0000)), band(rshift(n, 8), 0xff00)), rshift(n, 24))
+for k, v in obj do
+    print(k * k)
 end
-
-print(byteswap(5))
-print(log(5))
-print(floor(0.5))
-print(t)
 
 ```
 
 ### `outputs/output.luau`
 ```lua
-local math=require'./__polyfill__'.math local table=require'./__polyfill__'.table local io=nil local module=nil local package=nil local dofile=nil local loadfile=nil local load=nil local log=math.log
-local floor=math.floor
- do
-end  do
-end  do
-end  do  end  do
+local setmetatable=require'./__polyfill__'.setmetatable local __DALBIT_getmetatable_iter=require'./__polyfill__'.__DALBIT_getmetatable_iter local type=require'./__polyfill__'.type local next=require'./__polyfill__'.next local io=nil local module=nil local package=nil local dofile=nil local loadfile=nil local load=nil local obj={items={1,4,9}}
+setmetatable(obj,{__iter=function(o)return next,o.items end})do local _DALBIT_REMOVE_GENERALIZED_ITERATION_itere234e8bef135bb4c, _DALBIT_REMOVE_GENERALIZED_ITERATION_invare234e8bef135bb4c, _DALBIT_REMOVE_GENERALIZED_ITERATION_controle234e8bef135bb4c=
 
-end  do
-end local t=table.create(1)
-
-local function byteswap(n)
-return ((((((((n<<24)&0xFFFFFFFF)|((((n<<8)&0xFFFFFFFF)&0xff0000)&0xFFFFFFFF))&0xFFFFFFFF)|((((n>>8)&0xFFFFFFFF)&0xff00)&0xFFFFFFFF))&0xFFFFFFFF)|((n>>24)&0xFFFFFFFF))&0xFFFFFFFF)
-end
-
-print(byteswap(5))
-print(log(5))
-print(floor(0.5))
-print(t)
+obj if type(_DALBIT_REMOVE_GENERALIZED_ITERATION_itere234e8bef135bb4c)=='table'then local m=__DALBIT_getmetatable_iter(_DALBIT_REMOVE_GENERALIZED_ITERATION_itere234e8bef135bb4c)if type(m)=='table'and type(m.__iter)=='function'then _DALBIT_REMOVE_GENERALIZED_ITERATION_itere234e8bef135bb4c, _DALBIT_REMOVE_GENERALIZED_ITERATION_invare234e8bef135bb4c, _DALBIT_REMOVE_GENERALIZED_ITERATION_controle234e8bef135bb4c=m.__iter(_DALBIT_REMOVE_GENERALIZED_ITERATION_itere234e8bef135bb4c)else _DALBIT_REMOVE_GENERALIZED_ITERATION_itere234e8bef135bb4c, _DALBIT_REMOVE_GENERALIZED_ITERATION_invare234e8bef135bb4c, _DALBIT_REMOVE_GENERALIZED_ITERATION_controle234e8bef135bb4c=next, _DALBIT_REMOVE_GENERALIZED_ITERATION_itere234e8bef135bb4c end end for k,v in _DALBIT_REMOVE_GENERALIZED_ITERATION_itere234e8bef135bb4c,_DALBIT_REMOVE_GENERALIZED_ITERATION_invare234e8bef135bb4c,_DALBIT_REMOVE_GENERALIZED_ITERATION_controle234e8bef135bb4c do
+print(k*k)
+end end
 ```
+
+## How does it work?
+- Dalbit utilizes darklua and full-moon to transform lua scripts.
+
+## Real-world use cases
+- [Kaledis](https://github.com/orpos/kaledis) - A tool that enables Luau to work with Love2D, simplifying project management, transpiling, and configuration.
+- Overblox - A tool that can transpile Roblox scripts to OVERDARE scripts using Dalbit.
 
 ## Why `darklua-demo` over `darklua`?
 - `darklua-demo` is a temporary fork to work properly with dal.
 - `darklua-demo` will be replaced by official `darklua` once darklua released with important features to work properly with dal.
+
+## Contributions
+Any issues, advices, and PRs for contribution are welcome!
 
 ## Special Thanks
 - [seaofvoices/darklua](https://github.com/seaofvoices/darklua) - Providing important and cool lua mutating rules.
 - [Kampfkarren/full-moon](https://github.com/Kampfkarren/full-moon) - A lossless Lua parser.
 
 ## Trivia
-The name of this project, Dal, translates to "moon" in Korean.
+The name of this project, Dalbit, translates to "moonshine" in Korean.

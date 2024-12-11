@@ -4,8 +4,8 @@ mod cli;
 
 use anstyle::{AnsiColor, Color, Style};
 use clap::Parser;
-use cli::Dal;
-pub use dalbit_core;
+use cli::Dalbit;
+pub use kaledis_dalbit;
 use env_logger::Builder;
 use log::Level;
 
@@ -40,13 +40,13 @@ use log::Level;
 
 #[tokio::main(flavor = "multi_thread")]
 async fn main() -> ExitCode {
-    let dal = Dal::parse();
+    let dalbit = Dalbit::parse();
 
-    let filter = dal.get_log_level_filter();
+    let filter = dalbit.get_log_level_filter();
 
-    formatted_logger().filter_module("dal", filter).init();
+    formatted_logger().filter_module("dalbit", filter).init();
 
-    match dal.run().await {
+    match dalbit.run().await {
         Ok(code) => code,
         Err(err) => {
             eprintln!("{:?}", err);
