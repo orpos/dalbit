@@ -175,6 +175,19 @@ pub async fn process(manifest: Manifest, additional_modifiers: Option<&mut Vec<M
         let inject_global_value = rules::InjectGlobalValue::boolean(identifier, *value);
         additional_modifiers.push(Modifier::DarkluaRule(Box::new(inject_global_value)));
     }
+    // needed additional modifiers: inject_global_value
+    let mut additional_modifiers: Vec<Modifier> = Vec::new();
+    for (key, value) in polyfill_config {
+        let value = if let Some(val) = polyfill.config().get(key) {
+            val
+        } else {
+            value
+        };
+        let mut identifier = DALBIT_GLOBAL_IDENTIFIER_PREFIX.to_string();
+        identifier.push_str(key);
+        let inject_global_value = rules::InjectGlobalValue::boolean(identifier, *value);
+        additional_modifiers.push(Modifier::DarkluaRule(Box::new(inject_global_value)));
+    }
 
     if let Some(first_output) = output_files.first() {
         log::debug!("first output found!");

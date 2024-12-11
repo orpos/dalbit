@@ -95,6 +95,7 @@ impl Processor {
                     let mut mt_iter_call = FunctionCall::from_prefix(Box::new(mt_iter));
                     mt_iter_call = mt_iter_call
                         .with_argument(Expression::identifier(iterator_identifier.clone()));
+
                     let assign_from_iter = AssignStatement::new(
                         vec![
                             Variable::Identifier(iterator_identifier.clone()),
@@ -177,7 +178,7 @@ pub struct RemoveGeneralizedIteration {
 impl Default for RemoveGeneralizedIteration {
     fn default() -> Self {
         Self {
-            runtime_identifier_format: "_DARKLUA_REMOVE_GENERALIZED_ITERATION_{name}{hash}"
+            runtime_identifier_format: "_DALBIT_REMOVE_GENERALIZED_ITERATION_{name}{hash}"
                 .to_string(),
         }
     }
