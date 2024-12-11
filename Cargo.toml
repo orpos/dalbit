@@ -1,9 +1,9 @@
 [package]
 name = "dalbit"
 version = "0.1.0"
-authors = ["jeparlefrancais <jeparlefrancais21@gmail.com>", "jiwonz"]
+authors = ["jiwonz"]
 edition = "2021"
-description = "A Luau-to-Lua transpiler based on darklua"
+description = "A Luau-to-Lua transpiler"
 repository = "https://github.com/CavefulGames/dal"
 keywords = ["luau", "lua", "transpiler"]
 license = "MIT"
