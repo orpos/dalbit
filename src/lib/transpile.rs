@@ -190,7 +190,7 @@ pub async fn process(manifest: Manifest) -> Result<()> {
 
         if let Some(module_path) = first_output.parent().map(|parent| {
             parent
-                .join(manifest.injected_polyfill_name())
+                .join(polyfill.injection_path())
                 .with_extension(extension)
         }) {
             let _ = private_process(

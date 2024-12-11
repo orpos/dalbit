@@ -6,8 +6,6 @@ use tokio::fs;
 
 use crate::{polyfill::Polyfill, TargetVersion};
 
-pub const DEFAULT_INJECTED_POLYFILL_NAME: &str = "__polyfill__";
-
 #[async_trait::async_trait]
 pub trait WritableManifest: Send + Sized + Serialize + DeserializeOwned {
     #[inline]
@@ -32,15 +30,9 @@ pub struct Manifest {
     output: PathBuf,
     file_extension: Option<String>,
     target_version: TargetVersion,
-    #[serde(default = "default_injected_polyfill_name")]
-    injected_polyfill_name: String,
     pub minify: bool,
     modifiers: IndexMap<String, bool>,
     polyfill: Polyfill,
-}
-
-fn default_injected_polyfill_name() -> String {
-    DEFAULT_INJECTED_POLYFILL_NAME.to_owned()
 }
 
 impl Default for Manifest {
@@ -50,7 +42,6 @@ impl Default for Manifest {
             output: Path::new("output.lua").to_owned(),
             file_extension: Some("lua".to_owned()),
             target_version: TargetVersion::Lua53,
-            injected_polyfill_name: DEFAULT_INJECTED_POLYFILL_NAME.to_owned(),
             minify: true,
             modifiers: IndexMap::new(),
             polyfill: Polyfill::default(),
@@ -84,11 +75,6 @@ impl Manifest {
     #[inline]
     pub fn target_version(&self) -> &TargetVersion {
         &self.target_version
-    }
-
-    #[inline]
-    pub fn injected_polyfill_name(&self) -> &String {
-        &self.injected_polyfill_name
     }
 
     #[inline]

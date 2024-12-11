@@ -17,7 +17,8 @@ use url::Url;
 use crate::manifest::WritableManifest;
 use crate::{utils, TargetVersion};
 
-pub const DEFAULT_POLYFILL_URL: &str = "https://github.com/CavefulGames/dalbit-polyfill";
+pub const DEFAULT_REPO_URL: &str = "https://github.com/CavefulGames/dalbit-polyfill";
+pub const DEFAULT_INJECTION_PATH: &str = "__polyfill__";
 
 /// Cleans cache from polyfill repository url.
 pub async fn clean_cache(url: &Url) -> Result<()> {
@@ -51,19 +52,30 @@ pub struct Polyfill {
     #[serde(skip_serializing_if = "HashMap::is_empty")]
     #[serde(default)]
     config: HashMap<String, bool>,
+	injection_path: PathBuf,
 }
 
 impl Default for Polyfill {
     fn default() -> Self {
         Self {
-            repository: Url::from_str(DEFAULT_POLYFILL_URL).unwrap(),
+            repository: Url::from_str(DEFAULT_REPO_URL).unwrap(),
             globals: HashMap::new(),
             config: HashMap::new(),
+			injection_path: PathBuf::from_str(DEFAULT_INJECTION_PATH).unwrap(),
         }
     }
 }
 
 impl Polyfill {
+	pub fn new(repository: Url, injection_path: PathBuf) -> Self {
+		Self {
+			repository,
+			globals: HashMap::new(),
+			config: HashMap::new(),
+			injection_path,
+		}
+	}
+
     /// Loads polyfill cache.
     pub async fn cache(&self) -> Result<PolyfillCache> {
         PolyfillCache::new(&self.repository).await
@@ -83,6 +95,11 @@ impl Polyfill {
     pub fn config(&self) -> &HashMap<String, bool> {
         &self.config
     }
+
+	#[inline]
+	pub fn injection_path(&self) -> &PathBuf {
+		&self.injection_path
+	}
 }
 
 /// Polyfill's manifest (`/polyfill.toml` in a polyfill repository)
