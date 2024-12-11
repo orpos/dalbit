@@ -158,73 +158,72 @@ async fn private_process(
 pub async fn process(manifest: Manifest) -> Result<()> {
     let output_files =
         private_process(&manifest, manifest.input(), manifest.output(), None, false).await?;
-    for polyfill in manifest.polyfills() {
-        let polyfill_cache = polyfill.cache().await?;
-        let polyfill_config = polyfill_cache.config();
+    let polyfill = manifest.polyfill();
+    let polyfill_cache = polyfill.cache().await?;
+    let polyfill_config = polyfill_cache.config();
 
-        // needed additional modifiers: inject_global_value
-        let mut additional_modifiers: Vec<Modifier> = Vec::new();
-        for (key, value) in polyfill_config {
-            let value = if let Some(val) = polyfill.config().get(key) {
-                val
-            } else {
-                value
-            };
-            let mut identifier = DALBIT_GLOBAL_IDENTIFIER_PREFIX.to_string();
-            identifier.push_str(key);
-            let inject_global_value = rules::InjectGlobalValue::boolean(identifier, *value);
-            additional_modifiers.push(Modifier::DarkluaRule(Box::new(inject_global_value)));
-        }
+    // needed additional modifiers: inject_global_value
+    let mut additional_modifiers: Vec<Modifier> = Vec::new();
+    for (key, value) in polyfill_config {
+        let value = if let Some(val) = polyfill.config().get(key) {
+            val
+        } else {
+            value
+        };
+        let mut identifier = DALBIT_GLOBAL_IDENTIFIER_PREFIX.to_string();
+        identifier.push_str(key);
+        let inject_global_value = rules::InjectGlobalValue::boolean(identifier, *value);
+        additional_modifiers.push(Modifier::DarkluaRule(Box::new(inject_global_value)));
+    }
 
-        if let Some(first_output) = output_files.first() {
-            log::debug!("first output found!");
-            let extension = if let Some(extension) = manifest.file_extension() {
-                extension.to_owned()
-            } else {
-                first_output
-                    .extension()
-                    .ok_or_else(|| anyhow!("Failed to get extension from output file."))?
-                    .to_string_lossy()
-                    .into_owned()
-            };
+    if let Some(first_output) = output_files.first() {
+        log::debug!("first output found!");
+        let extension = if let Some(extension) = manifest.file_extension() {
+            extension.to_owned()
+        } else {
+            first_output
+                .extension()
+                .ok_or_else(|| anyhow!("Failed to get extension from output file."))?
+                .to_string_lossy()
+                .into_owned()
+        };
 
-            if let Some(module_path) = first_output.parent().map(|parent| {
-                parent
-                    .join(manifest.injected_polyfill_name())
-                    .with_extension(extension)
-            }) {
-                let _ = private_process(
-                    &manifest,
-                    polyfill_cache.globals_path(),
-                    &module_path,
-                    Some(&mut additional_modifiers),
-                    true,
-                )
-                .await?;
+        if let Some(module_path) = first_output.parent().map(|parent| {
+            parent
+                .join(manifest.injected_polyfill_name())
+                .with_extension(extension)
+        }) {
+            let _ = private_process(
+                &manifest,
+                polyfill_cache.globals_path(),
+                &module_path,
+                Some(&mut additional_modifiers),
+                true,
+            )
+            .await?;
 
-                let mut exports = polyfill_cache.globals_exports().to_owned();
-                for (key, value) in polyfill.globals() {
-                    if exports.contains(key) {
-                        if !value {
-                            exports.remove(key);
-                        }
-                    } else {
-                        return Err(anyhow!("Invalid global `{}`", key));
+            let mut exports = polyfill_cache.globals_exports().to_owned();
+            for (key, value) in polyfill.globals() {
+                if exports.contains(key) {
+                    if !value {
+                        exports.remove(key);
                     }
+                } else {
+                    return Err(anyhow!("Invalid global `{}`", key));
                 }
+            }
 
-                log::info!("[injector] exports to be injected: {:?}", exports);
+            log::info!("[injector] exports to be injected: {:?}", exports);
 
-                let injector = Injector::new(
-                    module_path,
-                    exports,
-                    manifest.target_version().to_lua_version(),
-                    polyfill_cache.removes().to_owned(),
-                );
+            let injector = Injector::new(
+                module_path,
+                exports,
+                manifest.target_version().to_lua_version(),
+                polyfill_cache.removes().to_owned(),
+            );
 
-                for source_path in &output_files {
-                    injector.inject(source_path).await?
-                }
+            for source_path in &output_files {
+                injector.inject(source_path).await?
             }
         }
     }

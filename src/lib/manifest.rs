@@ -36,8 +36,7 @@ pub struct Manifest {
     injected_polyfill_name: String,
     pub minify: bool,
     modifiers: IndexMap<String, bool>,
-    #[serde(rename = "polyfill")]
-    polyfills: Vec<Polyfill>,
+    polyfill: Polyfill,
 }
 
 fn default_injected_polyfill_name() -> String {
@@ -54,7 +53,7 @@ impl Default for Manifest {
             injected_polyfill_name: DEFAULT_INJECTED_POLYFILL_NAME.to_owned(),
             minify: true,
             modifiers: IndexMap::new(),
-            polyfills: vec![Polyfill::default()],
+            polyfill: Polyfill::default(),
         }
     }
 }
@@ -93,7 +92,7 @@ impl Manifest {
     }
 
     #[inline]
-    pub fn polyfills(&self) -> &Vec<Polyfill> {
-        &self.polyfills
+    pub fn polyfill(&self) -> &Polyfill {
+        &self.polyfill
     }
 }

@@ -13,10 +13,8 @@ pub struct FetchCommand {}
 impl FetchCommand {
     pub async fn run(self) -> Result<ExitCode> {
         let manifest = Manifest::from_file(DEFAULT_MANIFEST_PATH).await?;
-        for polyfill in manifest.polyfills() {
-            let polyfill_cache = polyfill.cache().await?;
-            polyfill_cache.fetch()?;
-        }
+        let polyfill_cache = manifest.polyfill().cache().await?;
+        polyfill_cache.fetch()?;
 
         // TO-DO: Is fetched polyfill already latest version?
 
