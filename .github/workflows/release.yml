@@ -81,6 +81,14 @@ jobs:
         with:
           ref: ${{ inputs.release_ref }}
 
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.cargo-target }}
+          override: true
+          profile: minimal
+
       - name: Install linker
         if: ${{ matrix.linker != '' }}
         run: |
