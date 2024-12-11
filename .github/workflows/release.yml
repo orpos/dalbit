@@ -81,19 +81,6 @@ jobs:
         with:
           ref: ${{ inputs.release_ref }}
 
-      # Install OpenSSL dependencies and development libraries
-      - name: Install OpenSSL
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libssl-dev
-
-      # Optional: If you're using OpenSSL via rust-openssl or other dependencies
-      - name: Set OPENSSL_DIR
-        run: |
-          echo "OPENSSL_DIR=/usr/local/opt/openssl@3" >> $GITHUB_ENV
-          echo "OPENSSL_INCLUDE_DIR=/usr/local/opt/openssl@3/include" >> $GITHUB_ENV
-          echo "OPENSSL_LIB_DIR=/usr/local/opt/openssl@3/lib" >> $GITHUB_ENV
-
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
@@ -124,7 +111,6 @@ jobs:
         run: cargo build --locked --release --target ${{ matrix.cargo-target }}
         env:
           CARGO_TARGET_DIR: output
-          OPENSSL_STATIC: 1
 
       - name: Setup archive
         shell: bash
