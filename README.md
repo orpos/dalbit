@@ -1,9 +1,6 @@
 # Dalbit
 Dalbit(달빛) is a Luau-to-Lua transpiler, designed specifically for `Lua 5.3`.
 
-## Note
-This project is still in W.I.P
-
 ## TO-DOs
 - [x] Implement CLI.
 - [x] Implement basic transpilation process using `darklua` and `full-moon`.
@@ -54,64 +51,43 @@ dalbit clean
 ## Example
 ### `dalbit.toml`
 ```toml
+input = "input.luau"
+output = "output.lua"
 file_extension = "lua"
 target_version = "lua53"
 minify = true
 
 [modifiers]
-convert_bit32 = true
 
-[globals]
+[polyfill]
+repository = "https://github.com/CavefulGames/dalbit-polyfill"
+injection_path = "__polyfill__"
 
 ```
 
 ### `inputs/input.luau`
 ```luau
-local log = math.log
-local floor = math.floor
-local x = bit32
-local band = x.band
-local rshift = x.rshift
-local lshift = x.lshift
-local bnot = x.bnot
-local bor = x.bor
-local t = table.create(1)
+local obj = { items = {1, 4, 9} }
+setmetatable(obj, { __iter = function(o) return next, o.items end })
 
-local function byteswap(n: number): number
-	return bor(bor(bor(lshift(n, 24), band(lshift(n, 8), 0xff0000)), band(rshift(n, 8), 0xff00)), rshift(n, 24))
+for k, v in obj do
+    print(k * k)
 end
-
-print(byteswap(5))
-print(log(5))
-print(floor(0.5))
-print(t)
 
 ```
 
 ### `outputs/output.luau`
 ```lua
-local math=require'./__polyfill__'.math local table=require'./__polyfill__'.table local io=nil local module=nil local package=nil local dofile=nil local loadfile=nil local load=nil local log=math.log
-local floor=math.floor
- do
-end  do
-end  do
-end  do  end  do
+local setmetatable=require'./__polyfill__'.setmetatable local __DALBIT_getmetatable_iter=require'./__polyfill__'.__DALBIT_getmetatable_iter local type=require'./__polyfill__'.type local next=require'./__polyfill__'.next local io=nil local module=nil local package=nil local dofile=nil local loadfile=nil local load=nil local obj={items={1,4,9}}
+setmetatable(obj,{__iter=function(o)return next,o.items end})do local _DALBIT_REMOVE_GENERALIZED_ITERATION_itere234e8bef135bb4c, _DALBIT_REMOVE_GENERALIZED_ITERATION_invare234e8bef135bb4c, _DALBIT_REMOVE_GENERALIZED_ITERATION_controle234e8bef135bb4c=
 
-end  do
-end local t=table.create(1)
-
-local function byteswap(n)
-return ((((((((n<<24)&0xFFFFFFFF)|((((n<<8)&0xFFFFFFFF)&0xff0000)&0xFFFFFFFF))&0xFFFFFFFF)|((((n>>8)&0xFFFFFFFF)&0xff00)&0xFFFFFFFF))&0xFFFFFFFF)|((n>>24)&0xFFFFFFFF))&0xFFFFFFFF)
-end
-
-print(byteswap(5))
-print(log(5))
-print(floor(0.5))
-print(t)
+obj if type(_DALBIT_REMOVE_GENERALIZED_ITERATION_itere234e8bef135bb4c)=='table'then local m=__DALBIT_getmetatable_iter(_DALBIT_REMOVE_GENERALIZED_ITERATION_itere234e8bef135bb4c)if type(m)=='table'and type(m.__iter)=='function'then _DALBIT_REMOVE_GENERALIZED_ITERATION_itere234e8bef135bb4c, _DALBIT_REMOVE_GENERALIZED_ITERATION_invare234e8bef135bb4c, _DALBIT_REMOVE_GENERALIZED_ITERATION_controle234e8bef135bb4c=m.__iter(_DALBIT_REMOVE_GENERALIZED_ITERATION_itere234e8bef135bb4c)else _DALBIT_REMOVE_GENERALIZED_ITERATION_itere234e8bef135bb4c, _DALBIT_REMOVE_GENERALIZED_ITERATION_invare234e8bef135bb4c, _DALBIT_REMOVE_GENERALIZED_ITERATION_controle234e8bef135bb4c=next, _DALBIT_REMOVE_GENERALIZED_ITERATION_itere234e8bef135bb4c end end for k,v in _DALBIT_REMOVE_GENERALIZED_ITERATION_itere234e8bef135bb4c,_DALBIT_REMOVE_GENERALIZED_ITERATION_invare234e8bef135bb4c,_DALBIT_REMOVE_GENERALIZED_ITERATION_controle234e8bef135bb4c do
+print(k*k)
+end end
 ```
 
 ## How does it work?
-- Dalbit actively utilizes darklua and full-moon to transform lua scripts.
+- Dalbit utilizes darklua and full-moon to transform lua scripts.
 
 ## Why `darklua-demo` over `darklua`?
 - `darklua-demo` is a temporary fork to work properly with dal.
