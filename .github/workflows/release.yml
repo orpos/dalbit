@@ -81,15 +81,10 @@ jobs:
         with:
           ref: ${{ inputs.release_ref }}
 
-      - name: Install OpenSSL dependencies
-        if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest' }}
+      - name: Set OpenSSL environment variable
         run: |
-          if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
-            sudo apt-get update
-            sudo apt-get install -y libssl-dev
-          elif [ "${{ matrix.os }}" == "macos-latest" ]; then
-            brew install openssl
-          fi
+          export OPENSSL_DIR=$(brew --prefix openssl@3)
+          echo "OpenSSL directory set to: $OPENSSL_DIR"
 
       - name: Install Rust
         uses: actions-rs/toolchain@v1
