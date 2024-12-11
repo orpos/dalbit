@@ -94,6 +94,10 @@ end end
 ## How does it work?
 - Dalbit utilizes darklua and full-moon to transform lua scripts.
 
+## Real-world use cases
+- [Kaledis](https://github.com/orpos/kaledis) - A tool that enables Luau to work with Love2D, simplifying project management, transpiling, and configuration.
+- Overblox - A tool that can transpile Roblox scripts to OVERDARE scripts using Dalbit.
+
 ## Why `darklua-demo` over `darklua`?
 - `darklua-demo` is a temporary fork to work properly with dal.
 - `darklua-demo` will be replaced by official `darklua` once darklua released with important features to work properly with dal.
