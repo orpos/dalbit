@@ -81,11 +81,6 @@ jobs:
         with:
           ref: ${{ inputs.release_ref }}
 
-      - name: Set OpenSSL environment variable
-        run: |
-          export OPENSSL_DIR=$(brew --prefix openssl@3)
-          echo "OpenSSL directory set to: $OPENSSL_DIR"
-
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
@@ -116,6 +111,7 @@ jobs:
         run: cargo build --locked --release --target ${{ matrix.cargo-target }}
         env:
           CARGO_TARGET_DIR: output
+          OPENSSL_STATIC: 1
 
       - name: Setup archive
         shell: bash
