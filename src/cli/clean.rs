@@ -2,10 +2,10 @@ use std::process::ExitCode;
 
 use anyhow::Result;
 use clap::Parser;
-use dal_core::polyfill;
+use dalbit_core::polyfill;
 use url::Url;
 
-/// Clean dal polyfills cache
+/// Clean dalbit polyfills cache
 #[derive(Debug, Clone, Parser)]
 pub struct CleanCommand {
     repo: Option<Url>,

@@ -2,11 +2,11 @@ use std::process::ExitCode;
 
 use anyhow::Result;
 use clap::Parser;
-use dal_core::manifest::{Manifest, WritableManifest};
+use dalbit_core::manifest::{Manifest, WritableManifest};
 
 use super::DEFAULT_MANIFEST_PATH;
 
-/// Fetch dal polyfills
+/// Fetch dalbit polyfills
 #[derive(Debug, Clone, Parser)]
 pub struct FetchCommand {}
 

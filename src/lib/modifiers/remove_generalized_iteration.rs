@@ -10,7 +10,7 @@ use super::runtime_identifier::RuntimeIdentifierBuilder;
 use darklua_core::rules::{Rule, RuleProcessResult};
 
 const METATABLE_VARIABLE_NAME: &str = "m";
-const GETMETATABLE_IDENTIFIER: &str = "__DAL_getmetatable_iter";
+const GETMETATABLE_IDENTIFIER: &str = "__DALBIT_getmetatable_iter";
 
 struct Processor {
     iterator_identifier: String,
@@ -175,7 +175,7 @@ pub struct RemoveGeneralizedIteration {
 impl Default for RemoveGeneralizedIteration {
     fn default() -> Self {
         Self {
-            runtime_identifier_format: "_DARKLUA_REMOVE_GENERALIZED_ITERATION_{name}{hash}"
+            runtime_identifier_format: "_DALBIT_REMOVE_GENERALIZED_ITERATION_{name}{hash}"
                 .to_string(),
         }
     }

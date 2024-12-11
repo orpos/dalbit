@@ -1,5 +1,5 @@
-# Dal
-Dal(달) is a Luau-to-Lua transpiler based on `darklua`, designed specifically for `Lua 5.3`.
+# Dalbit
+Dalbit(달빛) is a Luau-to-Lua transpiler, designed specifically for `Lua 5.3`.
 
 ## Note
 This project is still in W.I.P
@@ -11,8 +11,8 @@ This project is still in W.I.P
 - [x] Implement basic lua polyfills.
 - [x] Add tests for polyfills.
 - [ ] Add tests for transpilation. (to ensure the same results in lua and luau)
-- [ ] Add tests for dal internally.
-- [x] Add logging for dal internally for debug.
+- [ ] Add tests for dalbit internally.
+- [x] Add logging for dalbit internally for debug.
 - [x] `convert_bit32` modifier now converts `bit32.btest`.
 - [x] Add comments for docs and code readability. (WIP)
 - [x] Optimize polyfill.
@@ -21,32 +21,32 @@ This project is still in W.I.P
 
 ### Using Cargo (from crates.io)
 ```sh
-cargo install dal --locked
+cargo install dalbit --locked
 ```
 
 ## Usage
 
 ### `init`
-Initializes dal manifest file in the current path.
+Initializes dalbit manifest file in the current path.
 ```sh
-dal init
+dalbit init
 ```
 
 ### `fetch`
 Fetches and updates lua polyfills.
-* This polyfill can be found [here](https://github.com/CavefulGames/dal-polyfill).
+* This polyfill can be found [here](https://github.com/CavefulGames/dalbit-polyfill).
 ```sh
-dal fetch
+dalbit fetch
 ```
 
 ### `transpile`
 Transpiles luau code to lua code.
 ```sh
-dal transpile [input] [output]
+dalbit transpile [input] [output]
 ```
 
 ## Example
-### `dal.toml`
+### `dalbit.toml`
 ```toml
 file_extension = "lua"
 target_version = "lua53"
@@ -104,6 +104,9 @@ print(floor(0.5))
 print(t)
 ```
 
+## How does it work?
+- Dalbit actively utilizes darklua and full-moon to transform lua scripts.
+
 ## Why `darklua-demo` over `darklua`?
 - `darklua-demo` is a temporary fork to work properly with dal.
 - `darklua-demo` will be replaced by official `darklua` once darklua released with important features to work properly with dal.
@@ -113,4 +116,4 @@ print(t)
 - [Kampfkarren/full-moon](https://github.com/Kampfkarren/full-moon) - A lossless Lua parser.
 
 ## Trivia
-The name of this project, Dal, translates to "moon" in Korean.
+The name of this project, Dalbit, translates to "moonshine" in Korean.

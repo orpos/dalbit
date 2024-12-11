@@ -14,7 +14,7 @@ use init::InitCommand;
 use log::LevelFilter;
 use transpile::TranspileCommand;
 
-pub const DEFAULT_MANIFEST_PATH: &str = "dal.toml";
+pub const DEFAULT_MANIFEST_PATH: &str = "dalbit.toml";
 
 #[derive(Debug, Clone, Subcommand)]
 pub enum CliSubcommand {
@@ -45,14 +45,14 @@ impl GlobalOptions {
 /// Transpile Luau scripts
 #[derive(Parser, Debug, Clone)]
 #[command(version, about, long_about = None)]
-pub struct Dal {
+pub struct Dalbit {
     #[command(flatten)]
     global_options: GlobalOptions,
     #[clap(subcommand)]
     subcommand: CliSubcommand,
 }
 
-impl Dal {
+impl Dalbit {
     pub async fn run(self) -> Result<ExitCode> {
         match self.subcommand {
             CliSubcommand::Transpile(cmd) => cmd.run().await,

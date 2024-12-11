@@ -1,5 +1,5 @@
 [package]
-name = "dal"
+name = "dalbit"
 version = "0.1.0"
 authors = ["jeparlefrancais <jeparlefrancais21@gmail.com>", "jiwonz"]
 edition = "2021"
@@ -13,11 +13,11 @@ readme = "README.md"
 github = { repository = "CavefulGames/dal" }
 
 [lib]
-name = "dal_core"
+name = "dalbit_core"
 path = "src/lib/mod.rs"
 
 [[bin]]
-name = "dal"
+name = "dalbit"
 path = "src/main.rs"
 
 [profile.dev.package.full_moon]

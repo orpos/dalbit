@@ -10,7 +10,7 @@ use tokio::fs;
 
 use crate::{injector::Injector, manifest::Manifest, modifiers::Modifier, utils};
 
-pub const DAL_GLOBAL_IDENTIFIER_PREFIX: &str = "DAL_";
+pub const DALBIT_GLOBAL_IDENTIFIER_PREFIX: &str = "DALBIT_";
 
 pub const DEFAULT_LUAU_TO_LUA_MODIFIERS: [&str; 8] = [
     "remove_interpolated_string",
@@ -170,7 +170,7 @@ pub async fn process(manifest: Manifest) -> Result<()> {
             } else {
                 value
             };
-            let mut identifier = DAL_GLOBAL_IDENTIFIER_PREFIX.to_string();
+            let mut identifier = DALBIT_GLOBAL_IDENTIFIER_PREFIX.to_string();
             identifier.push_str(key);
             let inject_global_value = rules::InjectGlobalValue::boolean(identifier, *value);
             additional_modifiers.push(Modifier::DarkluaRule(Box::new(inject_global_value)));

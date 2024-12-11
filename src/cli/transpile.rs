@@ -2,7 +2,7 @@ use std::process::ExitCode;
 
 use anyhow::Result;
 use clap::Parser;
-use dal_core::{
+use dalbit_core::{
     manifest::{Manifest, WritableManifest},
     transpile,
 };

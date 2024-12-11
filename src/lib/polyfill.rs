@@ -17,7 +17,7 @@ use url::Url;
 use crate::manifest::WritableManifest;
 use crate::{utils, TargetVersion};
 
-pub const DEFAULT_POLYFILL_URL: &str = "https://github.com/CavefulGames/dal-polyfill";
+pub const DEFAULT_POLYFILL_URL: &str = "https://github.com/CavefulGames/dalbit-polyfill";
 
 /// Cleans cache from polyfill repository url.
 pub async fn clean_cache(url: &Url) -> Result<()> {
@@ -37,7 +37,7 @@ pub async fn clean_cache_all() -> Result<()> {
 pub fn cache_dir() -> Result<PathBuf> {
     Ok(dirs::cache_dir()
         .ok_or_else(|| anyhow!("could not find cache directory"))?
-        .join("dal")
+        .join("dalbit")
         .join("polyfills"))
 }
 

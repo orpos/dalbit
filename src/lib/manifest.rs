@@ -25,7 +25,7 @@ pub trait WritableManifest: Send + Sized + Serialize + DeserializeOwned {
     }
 }
 
-/// Manifest for dal transpiler. This is a writable manifest.
+/// Manifest for dalbit transpiler. This is a writable manifest.
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Manifest {
     input: PathBuf,

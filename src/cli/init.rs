@@ -2,11 +2,11 @@ use std::process::ExitCode;
 
 use anyhow::Result;
 use clap::Parser;
-use dal_core::manifest::{Manifest, WritableManifest};
+use dalbit_core::manifest::{Manifest, WritableManifest};
 
 use crate::cli::DEFAULT_MANIFEST_PATH;
 
-/// Initialize dal manifest file
+/// Initialize dalbit manifest file
 #[derive(Debug, Clone, Parser)]
 pub struct InitCommand {}
 
@@ -15,7 +15,7 @@ impl InitCommand {
         let manifest = Manifest::default();
         manifest.write(DEFAULT_MANIFEST_PATH).await?;
 
-        println!("Initialized dal.toml");
+        println!("Initialized dalbit.toml");
 
         return Ok(ExitCode::SUCCESS);
     }

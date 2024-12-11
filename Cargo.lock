@@ -363,7 +363,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "dal"
+name = "dalbit"
 version = "0.1.0"
 dependencies = [
  "anstyle",
