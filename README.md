@@ -42,7 +42,13 @@ dalbit fetch
 ### `transpile`
 Transpiles luau code to lua code.
 ```sh
-dalbit transpile [input] [output]
+dalbit transpile
+```
+
+### `clean`
+Cleans polyfill caches from disk.
+```sh
+dalbit clean
 ```
 
 ## Example
