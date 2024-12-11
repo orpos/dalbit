@@ -1,6 +1,6 @@
-use std::process::ExitCode;
+use std::{path::Path, process::ExitCode};
 
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use clap::Parser;
 use dalbit_core::manifest::{Manifest, WritableManifest};
 
@@ -12,10 +12,14 @@ pub struct InitCommand {}
 
 impl InitCommand {
     pub async fn run(self) -> Result<ExitCode> {
-        let manifest = Manifest::default();
-        manifest.write(DEFAULT_MANIFEST_PATH).await?;
+        if Path::new(DEFAULT_MANIFEST_PATH).exists() {
+            let manifest = Manifest::default();
+            manifest.write(DEFAULT_MANIFEST_PATH).await?;
 
-        println!("Initialized dalbit.toml");
+            println!("Initialized dalbit manifest");
+        } else {
+            return Err(anyhow!("Manifest has already been initialized"))
+        }
 
         return Ok(ExitCode::SUCCESS);
     }
