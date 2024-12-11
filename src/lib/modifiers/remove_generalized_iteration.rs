@@ -86,13 +86,16 @@ impl Processor {
                     let if_mt_table_condition =
                         get_type_condition(mt_identifier.clone().into(), "table");
                     let mt_iter = FieldExpression::new(
-                        Prefix::Identifier(mt_identifier),
+                        Prefix::Identifier(mt_identifier.clone()),
                         Identifier::new("__iter"),
                     );
                     let if_mt_iter_function_condition =
                         get_type_condition(mt_iter.clone().into(), "function");
 
-                    let mt_iter_call = FunctionCall::from_prefix(Prefix::Field(Box::new(mt_iter)));
+                    let mut mt_iter_call = FunctionCall::from_prefix(Box::new(mt_iter));
+                    mt_iter_call = mt_iter_call
+                        .with_argument(Expression::identifier(iterator_identifier.clone()));
+
                     let assign_from_iter = AssignStatement::new(
                         vec![
                             Variable::Identifier(iterator_identifier.clone()),

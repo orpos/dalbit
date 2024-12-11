@@ -13,7 +13,7 @@ pub struct InitCommand {}
 impl InitCommand {
     pub async fn run(self) -> Result<ExitCode> {
         if Path::new(DEFAULT_MANIFEST_PATH).exists() {
-            return Err(anyhow!("Manifest has already been initialized"))
+            return Err(anyhow!("Manifest has already been initialized"));
         } else {
             let manifest = Manifest::default();
             manifest.write(DEFAULT_MANIFEST_PATH).await?;

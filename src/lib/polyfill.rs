@@ -52,7 +52,7 @@ pub struct Polyfill {
     #[serde(skip_serializing_if = "HashMap::is_empty")]
     #[serde(default)]
     config: HashMap<String, bool>,
-	injection_path: PathBuf,
+    injection_path: PathBuf,
 }
 
 impl Default for Polyfill {
@@ -61,20 +61,20 @@ impl Default for Polyfill {
             repository: Url::from_str(DEFAULT_REPO_URL).unwrap(),
             globals: HashMap::new(),
             config: HashMap::new(),
-			injection_path: PathBuf::from_str(DEFAULT_INJECTION_PATH).unwrap(),
+            injection_path: PathBuf::from_str(DEFAULT_INJECTION_PATH).unwrap(),
         }
     }
 }
 
 impl Polyfill {
-	pub fn new(repository: Url, injection_path: PathBuf) -> Self {
-		Self {
-			repository,
-			globals: HashMap::new(),
-			config: HashMap::new(),
-			injection_path,
-		}
-	}
+    pub fn new(repository: Url, injection_path: PathBuf) -> Self {
+        Self {
+            repository,
+            globals: HashMap::new(),
+            config: HashMap::new(),
+            injection_path,
+        }
+    }
 
     /// Loads polyfill cache.
     pub async fn cache(&self) -> Result<PolyfillCache> {
@@ -96,10 +96,10 @@ impl Polyfill {
         &self.config
     }
 
-	#[inline]
-	pub fn injection_path(&self) -> &PathBuf {
-		&self.injection_path
-	}
+    #[inline]
+    pub fn injection_path(&self) -> &PathBuf {
+        &self.injection_path
+    }
 }
 
 /// Polyfill's manifest (`/polyfill.toml` in a polyfill repository)
