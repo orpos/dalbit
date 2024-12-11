@@ -1,10 +1,10 @@
 [package]
 name = "kaledis_dalbit"
-version = "0.1.0"
-authors = ["jeparlefrancais <jeparlefrancais21@gmail.com>", "jiwonz"]
+version = "0.1.1"
+authors = ["jeparlefrancais <jeparlefrancais21@gmail.com>", "jiwonz", "orpos"]
 edition = "2021"
 description = "A fork of a Luau-to-Lua transpiler based on darklua to use for kaledis"
-repository = "https://github.com/CavefulGames/dal"
+repository = "https://github.com/orpos/dalbit"
 keywords = ["luau", "lua", "transpiler"]
 license = "MIT"
 readme = "README.md"
@@ -13,11 +13,11 @@ readme = "README.md"
 github = { repository = "CavefulGames/dal" }
 
 [lib]
-name = "dal_core"
+name = "dalbit_core"
 path = "src/lib/mod.rs"
 
 [[bin]]
-name = "dal"
+name = "dalbit"
 path = "src/main.rs"
 
 [profile.dev.package.full_moon]

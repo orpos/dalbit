@@ -2,7 +2,7 @@ use std::process::ExitCode;
 
 use anyhow::Result;
 use clap::Parser;
-use dal_core::{
+use dalbit_core::{
     manifest::{Manifest, WritableManifest},
     transpile,
 };
@@ -20,7 +20,7 @@ impl TranspileCommand {
 
         let manifest = Manifest::from_file(DEFAULT_MANIFEST_PATH).await?;
 
-        transpile::process(manifest).await?;
+        transpile::process(manifest, None).await?;
 
         let process_duration = durationfmt::to_string(process_start_time.elapsed());
 

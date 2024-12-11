@@ -6,8 +6,6 @@ use tokio::fs;
 
 use crate::{polyfill::Polyfill, TargetVersion};
 
-pub const DEFAULT_INJECTED_POLYFILL_NAME: &str = "__polyfill__";
-
 #[async_trait::async_trait]
 pub trait WritableManifest: Send + Sized + Serialize + DeserializeOwned {
     #[inline]
@@ -25,24 +23,17 @@ pub trait WritableManifest: Send + Sized + Serialize + DeserializeOwned {
     }
 }
 
-/// Manifest for dal transpiler. This is a writable manifest.
+/// Manifest for dalbit transpiler. This is a writable manifest.
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Manifest {
     pub input: PathBuf,
     pub output: PathBuf,
     pub file_extension: Option<String>,
     pub target_version: TargetVersion,
-    #[serde(default = "default_injected_polyfill_name")]
-    pub injected_polyfill_name: String,
     pub minify: bool,
     pub modifiers: IndexMap<String, bool>,
-    #[serde(rename = "polyfill")]
-    pub polyfills: Vec<Polyfill>,
-    pub bundle : bool,
-}
-
-fn default_injected_polyfill_name() -> String {
-    DEFAULT_INJECTED_POLYFILL_NAME.to_owned()
+    pub polyfill: Polyfill,
+    pub bundle: bool
 }
 
 impl Default for Manifest {
@@ -52,10 +43,9 @@ impl Default for Manifest {
             output: Path::new("output.lua").to_owned(),
             file_extension: Some("lua".to_owned()),
             target_version: TargetVersion::Lua53,
-            injected_polyfill_name: DEFAULT_INJECTED_POLYFILL_NAME.to_owned(),
             minify: true,
             modifiers: IndexMap::new(),
-            polyfills: vec![Polyfill::default()],
+            polyfill: Polyfill::default(),
             bundle: false
         }
     }
@@ -90,12 +80,7 @@ impl Manifest {
     }
 
     #[inline]
-    pub fn injected_polyfill_name(&self) -> &String {
-        &self.injected_polyfill_name
-    }
-
-    #[inline]
-    pub fn polyfills(&self) -> &Vec<Polyfill> {
-        &self.polyfills
+    pub fn polyfill(&self) -> &Polyfill {
+        &self.polyfill
     }
 }

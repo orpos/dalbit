@@ -5,7 +5,7 @@ mod cli;
 use anstyle::{AnsiColor, Color, Style};
 use clap::Parser;
 use cli::Dal;
-pub use dal_core;
+pub use dalbit_core;
 use env_logger::Builder;
 use log::Level;
 

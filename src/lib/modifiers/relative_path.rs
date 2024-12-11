@@ -1,7 +1,7 @@
 // This is a custom rule needed for making relative imports like ../ work in love2d   (lettuce asked for this btw)
 // love2d gets with base the root of the project so i just translate it
 
-use std::path::{ self, Path, PathBuf } ;
+use std::path::{ self, Path, PathBuf };
 
 use darklua_core::{
     nodes::{ Arguments, Block, Expression, Prefix, StringExpression },
@@ -23,19 +23,24 @@ impl<'a> NodeProcessor for Processor<'a> {
                 let args = function_call.mutate_arguments();
                 if let Arguments::Tuple(dat) = args {
                     if let Some(Expression::String(expr)) = dat.iter_mut_values().next() {
-                        if expr.get_value().starts_with("../") {
+                        if
+                            expr.get_value().starts_with("../") ||
+                            expr.get_value().starts_with("./")
+                        {
                             let pth = path
                                 ::absolute(self.path.parent().unwrap().join(expr.get_value()))
                                 .expect("Failed To Find Module");
-                            let new_path = pth.strip_prefix(self.project_root).expect("Path strip failed.");
-
+                            let new_path = pth
+                                .strip_prefix(self.project_root)
+                                .expect("Path strip failed.");
                             *expr = StringExpression::from_value(
-                                &new_path
+                                &*new_path
                                     .to_path_buf()
                                     .into_iter()
                                     .map(|x| x.to_str().unwrap())
                                     .collect::<Vec<&str>>()
                                     .join(".")
+                                    .trim_end_matches(".luau")
                             );
                         }
                     }
