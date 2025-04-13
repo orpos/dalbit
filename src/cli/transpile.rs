@@ -2,10 +2,7 @@ use std::process::ExitCode;
 
 use anyhow::Result;
 use clap::Parser;
-use kaledis_dalbit::{
-    manifest::{Manifest, WritableManifest},
-    transpile,
-};
+use kaledis_dalbit::{ manifest::Manifest, transpile };
 use std::time::Instant;
 
 use super::DEFAULT_MANIFEST_PATH;

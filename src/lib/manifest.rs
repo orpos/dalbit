@@ -1,27 +1,11 @@
-use anyhow::Result;
+use anyhow::{Context, Result};
 use indexmap::IndexMap;
-use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 use tokio::fs;
 
 use crate::{polyfill::Polyfill, TargetVersion};
 
-#[async_trait::async_trait]
-pub trait WritableManifest: Send + Sized + Serialize + DeserializeOwned {
-    #[inline]
-    async fn from_file(path: impl Into<PathBuf> + Send) -> Result<Self> {
-        let content = fs::read_to_string(path.into()).await?;
-
-        Ok(toml::from_str(content.as_str())?)
-    }
-
-    #[inline]
-    async fn write(&self, path: impl Into<PathBuf> + Send) -> Result<()> {
-        fs::write(path.into(), toml::to_string(self)?).await?;
-
-        Ok(())
-    }
-}
 
 /// Manifest for dalbit transpiler. This is a writable manifest.
 #[derive(Debug, Deserialize, Serialize, Clone)]
@@ -51,9 +35,24 @@ impl Default for Manifest {
     }
 }
 
-impl WritableManifest for Manifest {}
 
 impl Manifest {
+    /// Load manifest from file.
+    pub async fn from_file(path: impl Into<PathBuf>) -> Result<Self> {
+        let path = path.into();
+        let manifest = fs::read_to_string(&path).await?;
+        let manifest: Manifest = toml::from_str(&manifest)
+            .with_context(|| format!("Failed to parse manifest file: {:?}", path))?;
+        // manifest.path = path;
+        Ok(manifest)
+    }
+
+    /// Write manifest to file.
+    pub async fn write(&self, path: impl Into<PathBuf>) -> Result<()> {
+        fs::write(path.into(), toml::to_string(self)?).await?;
+        Ok(())
+    }
+
     #[inline]
     pub fn input(&self) -> &PathBuf {
         &self.input

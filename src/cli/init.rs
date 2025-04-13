@@ -2,7 +2,7 @@ use std::{path::Path, process::ExitCode};
 
 use anyhow::{anyhow, Result};
 use clap::Parser;
-use kaledis_dalbit::manifest::{Manifest, WritableManifest};
+use kaledis_dalbit::manifest::Manifest;
 
 use crate::cli::DEFAULT_MANIFEST_PATH;
 

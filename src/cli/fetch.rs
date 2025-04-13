@@ -2,7 +2,7 @@ use std::process::ExitCode;
 
 use anyhow::Result;
 use clap::Parser;
-use kaledis_dalbit::manifest::{Manifest, WritableManifest};
+use kaledis_dalbit::manifest::Manifest;
 
 use super::DEFAULT_MANIFEST_PATH;
 

@@ -1,10 +1,12 @@
-use std::{path::PathBuf, str::FromStr};
+use std::{ffi::OsStr, path::PathBuf, str::FromStr};
 
 use anyhow::{anyhow, Result};
+use async_walkdir::WalkDir;
 use darklua_core::{
     rules::{self, bundle::BundleRequireMode},
     BundleConfiguration, Configuration, GeneratorParameters, Options, Resources,
 };
+use futures_lite::stream::StreamExt;
 use indexmap::IndexMap;
 use tokio::fs;
 
@@ -79,7 +81,7 @@ async fn private_process(
             match modifier {
                 Modifier::DarkluaRule(darklua_rule) => rules.push(darklua_rule),
                 Modifier::FullMoonVisitor(fullmoon_visitor) => {
-                    fullmoon_visitors.push(fullmoon_visitor)
+                    fullmoon_visitors.push(fullmoon_visitor);
                 }
             }
             (rules, fullmoon_visitors)
@@ -104,11 +106,12 @@ async fn private_process(
             .fold(config, |config, rule| config.with_rule(rule))
     });
     options = options.with_output(&output);
-    let result = darklua_core::process(&resources, options);
+    let result = darklua_core::process(&resources, options).map_err(|e| anyhow!(e))?;
 
     let success_count = result.success_count();
-    if result.has_errored() {
-        let error_count = result.error_count();
+    let errors = result.collect_errors();
+    let error_count = errors.len();
+    if error_count > 0 {
         eprintln!(
             "{}{} error{} happened:",
             if success_count > 0 { "but " } else { "" },
@@ -116,12 +119,31 @@ async fn private_process(
             if error_count > 1 { "s" } else { "" }
         );
 
-        result.errors().for_each(|error| eprintln!("-> {}", error));
+        errors
+            .into_iter()
+            .for_each(|error| eprintln!("-> {}", error));
 
         return Err(anyhow!("darklua process was not successful"));
     }
 
-    let mut created_files: Vec<PathBuf> = result.into_created_files().collect();
+    let mut created_files: Vec<PathBuf> = if output.is_dir() {
+        let mut created_files = Vec::new();
+        let mut entries = WalkDir::new(output);
+        while let Some(entry) = entries.next().await {
+            let path = entry?.path();
+            if !matches!(
+                path.extension().and_then(OsStr::to_str),
+                Some("lua") | Some("luau")
+            ) {
+                continue;
+            }
+            created_files.push(path);
+        }
+        created_files
+    } else {
+        vec![output.clone()]
+    };
+
     let extension = manifest.file_extension();
     if fullmoon_visitors.is_empty() {
         if let Some(extension) = extension {
@@ -155,26 +177,22 @@ async fn private_process(
     Ok(created_files)
 }
 
-pub async fn process(manifest: Manifest, additional_modifiers: Option<&mut Vec<Modifier>>) -> Result<()> {
-    let output_files =
-        private_process(&manifest, manifest.input(), manifest.output(), additional_modifiers, manifest.bundle).await?;
+pub async fn process(
+    manifest: Manifest,
+    additional_modifiers: Option<&mut Vec<Modifier>>,
+) -> Result<()> {
+    let output_files = private_process(
+        &manifest,
+        manifest.input(),
+        manifest.output(),
+        additional_modifiers,
+        manifest.bundle,
+    )
+    .await?;
     let polyfill = manifest.polyfill();
     let polyfill_cache = polyfill.cache().await?;
     let polyfill_config = polyfill_cache.config();
 
-    // needed additional modifiers: inject_global_value
-    let mut additional_modifiers: Vec<Modifier> = Vec::new();
-    for (key, value) in polyfill_config {
-        let value = if let Some(val) = polyfill.config().get(key) {
-            val
-        } else {
-            value
-        };
-        let mut identifier = DALBIT_GLOBAL_IDENTIFIER_PREFIX.to_string();
-        identifier.push_str(key);
-        let inject_global_value = rules::InjectGlobalValue::boolean(identifier, *value);
-        additional_modifiers.push(Modifier::DarkluaRule(Box::new(inject_global_value)));
-    }
     // needed additional modifiers: inject_global_value
     let mut additional_modifiers: Vec<Modifier> = Vec::new();
     for (key, value) in polyfill_config {
@@ -200,7 +218,7 @@ pub async fn process(manifest: Manifest, additional_modifiers: Option<&mut Vec<M
                 .to_string_lossy()
                 .into_owned()
         };
-
+        // TODO: share polyfill
         if let Some(module_path) = first_output.parent().map(|parent| {
             parent
                 .join(polyfill.injection_path())
@@ -236,7 +254,7 @@ pub async fn process(manifest: Manifest, additional_modifiers: Option<&mut Vec<M
             );
 
             for source_path in &output_files {
-                injector.inject(source_path).await?
+                injector.inject(source_path).await?;
             }
         }
     }

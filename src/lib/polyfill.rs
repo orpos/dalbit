@@ -14,7 +14,6 @@ use std::str::FromStr;
 use tokio::fs;
 use url::Url;
 
-use crate::manifest::WritableManifest;
 use crate::{utils, TargetVersion};
 
 pub const DEFAULT_REPO_URL: &str = "https://github.com/CavefulGames/dalbit-polyfill";
@@ -111,7 +110,22 @@ pub struct PolyfillManifest {
     lua_version: TargetVersion,
 }
 
-impl WritableManifest for PolyfillManifest {}
+impl PolyfillManifest {
+    /// Load polyfill manifest from file.
+    pub async fn from_file(path: impl Into<PathBuf>) -> Result<Self> {
+        let path = path.into();
+        let manifest = fs::read_to_string(&path).await?;
+        let manifest: Self = toml::from_str(&manifest)
+            .with_context(|| format!("Could not parse polyfill manifest file: {:?}", path))?;
+        Ok(manifest)
+    }
+
+    /// Write polyfill manifest to file.
+    pub async fn write(&self, path: impl Into<PathBuf>) -> Result<()> {
+        fs::write(path.into(), toml::to_string(self)?).await?;
+        Ok(())
+    }
+}
 
 /// Polyfill's globals.
 #[derive(Debug)]
@@ -175,9 +189,13 @@ impl PolyfillCache {
         let globals_path = path.join(&manifest.globals);
         log::debug!("globals path {:?}", globals_path);
         let globals_ast = utils::parse_file(&globals_path, &manifest.lua_version).await?;
-        let exports = utils::get_exports_from_last_stmt(&utils::ParseTarget::FullMoonAst(globals_ast))
-            .await?
-            .ok_or_else(|| anyhow!("Invalid polyfill structure. Polyfills' globals must return at least one global in a table."))?;
+        let exports = utils
+            ::get_exports_from_last_stmt(&utils::ParseTarget::FullMoonAst(globals_ast)).await?
+            .ok_or_else(||
+                anyhow!(
+                    "Invalid polyfill structure. Polyfills' globals must return at least one global in a table."
+                )
+            )?;
 
         let globals = Globals {
             path: globals_path,
